@@ -6,20 +6,36 @@ Golang Plugin development + testing using the [`go-plugin`](https://github.com/h
 
 # Quick Start ⚡
 
+## 1. Start the Server 
+First start the server:
+
 ```console
 ➜ git clone https://github.com/ohsu-comp-bio/plugins
 
 ➜ cd plugins
 
-➜ ./build.sh
+➜ make && ./authorize
+Building ./authorize...OK
 
-➜ ./authorize "Alyssa P. Hacker"
-Before auth ➜ User: Alyssa P. Hacker
- After auth ➜ User: Alyssa P. Hacker, Token: <Alyssa's Secret Token>
+➜ Listening on http://localhost:8080
+```
 
-➜ ./authorize "Eva Lu Ator"  
-Before auth ➜ User: Eva Lu Ator
- After auth ➜ User: Eva Lu Ator, Token: <Eva's Secret Token>
+## 2. Send Requests
+
+In another terminal, send the request using of the example users below:
+
+```console
+➜ curl -H "Authorization: Bearer Alyssa P. Hacker" http://localhost:8080
+
+User: Alyssa P. Hacker, Token: <Alyssa's Secret>  ✅
+```
+
+Here's an example of a user that's not found by the plugin (representing an "Unauthorize" user):
+
+```console
+➜ curl -H "Authorization: Bearer Foobar" http://localhost:8080
+
+Error: User Foobar not found ❌
 ```
 
 # Example Users ✍️
