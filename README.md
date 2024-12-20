@@ -22,7 +22,7 @@ Before auth ➜ User: Eva Lu Ator
  After auth ➜ User: Eva Lu Ator, Token: <Eva's Secret Token>
 ```
 
-## Example Users ✍️
+# Example Users ✍️
 
 [Example users](https://en.wikipedia.org/wiki/Structure_and_Interpretation_of_Computer_Programs#Characters) may be found in [example-users.csv](./example-users.csv):
 > - Alyssa P. Hacker, a Lisp hacker
