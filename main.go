@@ -8,34 +8,20 @@ package main
 import (
 	"fmt"
 	"log"
-	"os"
+	"net/http"
 	"regexp"
+	"strings"
 
 	"example.com/auth"
 	"example.com/plugin"
 )
 
 func main() {
-	// Load plugins from the plugin-binaries directory.
-	var pm plugin.Manager
-	if err := pm.LoadPlugins("./plugin-binaries/"); err != nil {
-		log.Fatal("loading plugins:", err)
-	}
-	defer pm.Close()
+	mux := http.NewServeMux()
+	mux.HandleFunc("/", getRoot)
 
-	// Create a dummy post to wrap the contents with additional metadata.
-	auth := &auth.Auth{}
-
-	// Access other arguments
-	if len(os.Args) > 1 {
-		auth.User = os.Args[1]
-	} else {
-		log.Fatal("User not provided")
-	}
-
-	fmt.Printf("Before auth ➜ User: %s\n", auth.User)
-	result := authorize(&pm, auth)
-	fmt.Printf(" After auth ➜ User: %s, Token: %s\n", result.User, result.Token)
+	fmt.Println("Listening on http://localhost:8080")
+	_ = http.ListenAndServe(":8080", mux)
 }
 
 var rolePattern = regexp.MustCompile(":(\\w+):`([^`]*)`")
@@ -45,4 +31,36 @@ var rolePattern = regexp.MustCompile(":(\\w+):`([^`]*)`")
 // within it.
 func authorize(pm *plugin.Manager, auth *auth.Auth) auth.Auth {
 	return pm.ApplyContentsHooks(auth.User)
+}
+
+func getRoot(w http.ResponseWriter, r *http.Request) {
+	// Load plugins from the plugin-binaries directory.
+	var pm plugin.Manager
+	if err := pm.LoadPlugins("./plugin-binaries/"); err != nil {
+		log.Fatal("loading plugins:", err)
+	}
+	defer pm.Close()
+
+	authHeader := r.Header.Get("Authorization")
+	if authHeader == "" {
+		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+		return
+	}
+
+	// Assuming the Authorization header is in the format "Bearer <username>"
+	parts := strings.SplitN(authHeader, " ", 2)
+	if len(parts) != 2 || parts[0] != "Bearer" {
+		http.Error(w, "Unauthorized", http.StatusUnauthorized)
+		return
+	}
+
+	user := parts[1]
+	auth := &auth.Auth{User: user}
+	result := authorize(&pm, auth)
+
+	if result.Token == "" {
+		fmt.Fprintf(w, "Error: User %s not found\n", user)
+	} else {
+		fmt.Fprintf(w, "User: %s, Token: %s\n", result.User, result.Token)
+	}
 }

@@ -69,7 +69,8 @@ type PluginClientRPC struct {
 func (c *PluginClientRPC) Hooks() []string {
 	var reply HooksReply
 	if err := c.client.Call("Plugin.Hooks", HooksArgs{}, &reply); err != nil {
-		log.Fatal(err)
+		log.Printf("Error calling Plugin.Hooks: %v", err)
+		return nil
 	}
 	return reply.Hooks
 }
@@ -79,7 +80,7 @@ func (c *PluginClientRPC) ProcessContents(val string) (auth.Auth, error) {
 	err := c.client.Call("Plugin.ProcessContents", AuthArgs{Value: val}, &reply)
 
 	if err != nil {
-		log.Fatal(err)
+		log.Printf("Error calling Plugin.ProcessContents: %v", err)
 	}
 
 	return reply.Auth, reply.Err
@@ -90,7 +91,7 @@ func (c *PluginClientRPC) ProcessRole(role string, val string) string {
 	err := c.client.Call("Plugin.ProcessRole", RoleArgs{Role: role, Value: val}, &reply)
 
 	if err != nil {
-		log.Fatal(err)
+		log.Printf("Error calling Plugin.ProcessRole: %v", err)
 	}
 
 	return reply.Value
