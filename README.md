@@ -15,7 +15,7 @@ Golang Plugin development + testing using the [`go-plugin`](https://github.com/h
 Before auth ➜ User: Alyssa P. Hacker
  After auth ➜ User: Alyssa P. Hacker, Token: <Alyssa's Secret Token>
 
-./authorize "Eva Lu Ator"  
+➜ ./authorize "Eva Lu Ator"  
 Before auth ➜ User: Eva Lu Ator
  After auth ➜ User: Eva Lu Ator, Token: <Eva's Secret Token>
 ```
