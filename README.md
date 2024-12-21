@@ -14,10 +14,11 @@ First start the server:
 
 ➜ cd plugins
 
-➜ make && ./authorize
+➜ make
 Building ./authorize...OK
 
-➜ Listening on http://localhost:8080
+➜ ./authorize
+Listening on http://localhost:8080
 ```
 
 ## 2. Send Requests
