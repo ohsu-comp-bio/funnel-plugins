@@ -49,8 +49,8 @@ func getRoot(w http.ResponseWriter, r *http.Request) {
 	result := authorize(&pm, authHeader)
 
 	if result.Token == "" {
-		fmt.Fprintf(w, "Error: User not found\n")
+		fmt.Fprintf(w, "Error: User not found ❌\n")
 	} else {
-		fmt.Fprintf(w, "User: %s, Token: %s\n", result.User, result.Token)
+		fmt.Fprintf(w, "User: %s, Token: %s ✅\n", result.User, result.Token)
 	}
 }
