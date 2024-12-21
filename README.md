@@ -31,7 +31,7 @@ In another terminal, send the request using of the example users below:
 User: Alyssa P. Hacker, Token: <Alyssa's Secret> ✅
 ```
 
-Here's an example of a user that's not found by the plugin (representing an "Unauthorize" user):
+Here's an example of a user that's not found by the plugin (representing an `Unauthorized` user):
 
 ```console
 ➜ curl -H "Authorization: Bearer Foobar" http://localhost:8080
