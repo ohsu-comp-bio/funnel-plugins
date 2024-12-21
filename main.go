@@ -10,7 +10,6 @@ import (
 	"log"
 	"net/http"
 	"regexp"
-	"strings"
 
 	"example.com/auth"
 	"example.com/plugin"
@@ -29,8 +28,8 @@ var rolePattern = regexp.MustCompile(":(\\w+):`([^`]*)`")
 // authorize turns the text of post.Contents into HTML and returns it; it uses
 // the plugin manager to invoke loaded plugins on the contents and the roles
 // within it.
-func authorize(pm *plugin.Manager, auth *auth.Auth) auth.Auth {
-	return pm.ApplyContentsHooks(auth.User)
+func authorize(pm *plugin.Manager, authHeader string) auth.Auth {
+	return pm.ApplyContentsHooks(authHeader)
 }
 
 func getRoot(w http.ResponseWriter, r *http.Request) {
@@ -47,19 +46,10 @@ func getRoot(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Assuming the Authorization header is in the format "Bearer <username>"
-	parts := strings.SplitN(authHeader, " ", 2)
-	if len(parts) != 2 || parts[0] != "Bearer" {
-		http.Error(w, "Unauthorized", http.StatusUnauthorized)
-		return
-	}
-
-	user := parts[1]
-	auth := &auth.Auth{User: user}
-	result := authorize(&pm, auth)
+	result := authorize(&pm, authHeader)
 
 	if result.Token == "" {
-		fmt.Fprintf(w, "Error: User %s not found\n", user)
+		fmt.Fprintf(w, "Error: User not found\n")
 	} else {
 		fmt.Fprintf(w, "User: %s, Token: %s\n", result.User, result.Token)
 	}

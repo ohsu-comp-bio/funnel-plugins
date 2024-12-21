@@ -18,8 +18,15 @@ func (ExampleAuthorizer) Hooks() []string {
 	return []string{"contents"}
 }
 
-func (ExampleAuthorizer) ProcessContents(user string) (auth.Auth, error) {
-	fmt.Printf("Processing content %s\n", user)
+func (ExampleAuthorizer) ProcessContents(authHeader string) (auth.Auth, error) {
+	// Assuming the Authorization header is in the format "Bearer <username>"
+	parts := strings.SplitN(authHeader, " ", 2)
+	if len(parts) != 2 || parts[0] != "Bearer" {
+		return auth.Auth{}, fmt.Errorf("Invalid Authorization header")
+	}
+
+	user := parts[1]
+
 	// Read file
 	file, err := os.Open("example-users.csv")
 	if err != nil {
