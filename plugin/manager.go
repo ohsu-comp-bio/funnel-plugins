@@ -3,6 +3,7 @@ package plugin
 
 import (
 	"fmt"
+	"net/http"
 	"os/exec"
 	"strings"
 
@@ -105,12 +106,12 @@ func (m *Manager) ApplyRoleHooks(rolename, roletext string) (string, error) {
 // ApplyContentsHooks applies registered plugins to the given post contents,
 // returning the transformed value. All registered plugins are applied in
 // sequence to the value.
-func (m *Manager) ApplyContentsHooks(user string) auth.Auth {
+func (m *Manager) ApplyContentsHooks(request *http.Request) auth.Auth {
 	var auth auth.Auth
 	var err error
 
 	for _, hook := range m.contentsHooks {
-		auth, err = hook.ProcessContents(user)
+		auth, err = hook.ProcessContents(request)
 		if err != nil {
 			fmt.Printf("Error processing contents: %s\n", err)
 		}

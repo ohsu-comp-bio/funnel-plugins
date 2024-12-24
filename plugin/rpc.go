@@ -6,6 +6,7 @@ package plugin
 
 import (
 	"log"
+	"net/http"
 	"net/rpc"
 
 	"example.com/auth"
@@ -20,7 +21,7 @@ type HooksReply struct {
 }
 
 type AuthArgs struct {
-	Value string
+	Value *http.Request
 	Auth  auth.Auth
 }
 
@@ -75,7 +76,7 @@ func (c *PluginClientRPC) Hooks() []string {
 	return reply.Hooks
 }
 
-func (c *PluginClientRPC) ProcessContents(val string) (auth.Auth, error) {
+func (c *PluginClientRPC) ProcessContents(val *http.Request) (auth.Auth, error) {
 	var reply AuthReply
 	err := c.client.Call("Plugin.ProcessContents", AuthArgs{Value: val}, &reply)
 

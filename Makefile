@@ -8,3 +8,4 @@ build:
 	@go build -o ./plugin-binaries/exampleAuthorizer ./authorizer/
 	@go build -o ./authorize ./main.go
 	@echo "OK"
+	

@@ -1,6 +1,10 @@
 package plugin
 
-import "example.com/auth"
+import (
+	"net/http"
+
+	"example.com/auth"
+)
 
 // Auth is the interface plugins have to implement. To avoid calling the
 // plugin for roles it doesn't support, it has to tell the plugin managers
@@ -25,5 +29,5 @@ type Authorizer interface {
 	// ProcessContents is called on the entire post contents, if requested in
 	// Hooks(). It takes the contents and the post and should return the
 	// transformed contents.
-	ProcessContents(user string) (auth.Auth, error)
+	ProcessContents(request *http.Request) (auth.Auth, error)
 }
