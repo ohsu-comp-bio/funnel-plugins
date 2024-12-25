@@ -13,9 +13,9 @@ In this setup, the Plugin handles all user authentication, with the Server havin
 ## 1. Start the Server 
 
 ```console
-➜ git clone https://github.com/ohsu-comp-bio/plugins
+➜ git clone https://github.com/ohsu-comp-bio/funnel-plugins
 
-➜ cd plugins
+➜ cd funnle-plugins
 
 ➜ make
 Building ./server...OK
