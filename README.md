@@ -26,14 +26,12 @@ Listening on http://localhost:8080
 
 ## 2. Send Requests
 
-In another terminal, send the request using of the examples below —
-
-### Requirements:
+In another terminal, send the request using of the examples below with the required inputs —
  
-| Requirement | Sent in...           | Example                                  |
-|-------------|----------------------|------------------------------------------|
-| User        | Authorization Header | `Authorization: Bearer Alyssa P. Hacker` |
-| Task        | Request Body         | `@example-tasks/hello-world.json`        |
+| Required Input | Sent in...           | Example                                  |
+| -------------- | -------------------- | ---------------------------------------- |
+| User           | Authorization Header | `Authorization: Bearer Alyssa P. Hacker` |
+| Task           | Request Body         | `@example-tasks/hello-world.json`        |
 
 ### Example: Authorized User
 
