@@ -6,10 +6,6 @@ This repo contains Funnel Plugin development using the [`go-plugin`](https://git
 
 In this setup, the Plugin handles all user authentication, with the Server having no "knowledge" or record of user credentials/tokens (e.g. [`example-users.csv`](./authorizer/example-users.csv)).
 
-TODO: 
-- Add steps/docs for writing additional custom plugins to integrate with Funnel...
-- Add sequence diagram of Server/Plugin interactions
-
 # Quick Start ⚡
 
 ## 1. Start the Server 
@@ -70,6 +66,11 @@ All ["Authorized" users](https://en.wikipedia.org/wiki/Structure_and_Interpretat
 > - Louis Reasoner, a loose reasoner
 
 Here the use of a simple text file to contain users is to show how a plugin can be written and integrated into Funnel — real world use cases might involve more complex mechanisms for tracking users (e.g OAuth)...
+
+# Next Steps 🚧
+[] Add steps/docs for writing additional custom plugins to integrate with Funnel...
+[] Add sequence diagram of Server/Plugin interactions
+[] Add real world use case example/docs
 
 # Additional Resources 📚
 
