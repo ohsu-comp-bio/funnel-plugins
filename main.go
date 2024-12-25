@@ -7,24 +7,17 @@
 package main
 
 import (
-	"encoding/gob"
 	"fmt"
+	"io"
 	"log"
 	"net/http"
 	"os"
 	"os/signal"
-	"regexp"
 	"syscall"
 
 	"example.com/auth"
 	"example.com/plugin"
 )
-
-// Register the http.NoBody type to avoid the following error:
-// "Error calling Plugin.ProcessContents: gob: type not registered for interface: http.noBody"
-func init() {
-	gob.Register(http.NoBody)
-}
 
 func main() {
 	mux := http.NewServeMux()
@@ -44,13 +37,10 @@ func main() {
 	fmt.Println("Shutting down server...")
 }
 
-var rolePattern = regexp.MustCompile(":(\\w+):`([^`]*)`")
-
 // authorize turns the text of post.Contents into HTML and returns it; it uses
-// the plugin manager to invoke loaded plugins on the contents and the roles
-// within it.
-func authorize(pm *plugin.Manager, request *http.Request) auth.Auth {
-	return pm.ApplyContentsHooks(request)
+// the plugin manager to invoke loaded plugins on the contents within it.
+func authorize(pm *plugin.Manager, headers map[string][]string, body []byte) (auth.Auth, error) {
+	return pm.ApplyContentsHooks(headers, body)
 }
 
 func getRoot(w http.ResponseWriter, r *http.Request) {
@@ -61,11 +51,19 @@ func getRoot(w http.ResponseWriter, r *http.Request) {
 	}
 	defer pm.Close()
 
-	result := authorize(&pm, r)
+	headers := r.Header
 
-	if result.Token == "" {
-		fmt.Fprintf(w, "Error: User not found ❌\n")
+	body, err := io.ReadAll(r.Body)
+	if err != nil {
+		http.Error(w, "Failed to read request body", http.StatusInternalServerError)
+		return
+	}
+
+	resp, err := authorize(&pm, headers, body)
+
+	if err != nil {
+		fmt.Fprintf(w, "Error: %v ❌\n", err)
 	} else {
-		fmt.Fprintf(w, "User: %s, Token: %s ✅", result.User, result.Token)
+		fmt.Fprintf(w, "Response: %v ✅\n", resp)
 	}
 }

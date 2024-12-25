@@ -6,7 +6,6 @@ package plugin
 
 import (
 	"log"
-	"net/http"
 	"net/rpc"
 
 	"example.com/auth"
@@ -21,23 +20,13 @@ type HooksReply struct {
 }
 
 type AuthArgs struct {
-	Value *http.Request
-	Auth  auth.Auth
+	Headers map[string][]string
+	Body    []byte
 }
 
 type AuthReply struct {
 	Auth auth.Auth
 	Err  error
-}
-
-type RoleArgs struct {
-	Role  string
-	Value string
-	Auth  auth.Auth
-}
-
-type RoleReply struct {
-	Value string
 }
 
 // PluginServerRPC is used by plugins to map RPC calls from the clients to
@@ -51,18 +40,13 @@ func (s *PluginServerRPC) Hooks(args HooksArgs, reply *HooksReply) error {
 	return nil
 }
 
-func (s *PluginServerRPC) ProcessContents(args AuthArgs, reply *AuthReply) error {
-	reply.Auth, reply.Err = s.Impl.ProcessContents(args.Value)
-	return nil
-}
-
-func (s *PluginServerRPC) ProcessRole(args RoleArgs, reply *RoleReply) error {
-	reply.Value = s.Impl.ProcessRole(args.Role, args.Value)
-	return nil
+func (s *PluginServerRPC) Authorize(args AuthArgs, reply *AuthReply) error {
+	reply.Auth, reply.Err = s.Impl.Authorize(args.Headers, args.Body)
+	return reply.Err
 }
 
 // PluginClientRPC is used by clients (main application) to translate the
-// Htmlize interface of plugins to RPC calls.
+// Authorize interface of plugins to RPC calls.
 type PluginClientRPC struct {
 	client *rpc.Client
 }
@@ -76,24 +60,14 @@ func (c *PluginClientRPC) Hooks() []string {
 	return reply.Hooks
 }
 
-func (c *PluginClientRPC) ProcessContents(val *http.Request) (auth.Auth, error) {
+func (c *PluginClientRPC) Authorize(headers map[string][]string, body []byte) (auth.Auth, error) {
 	var reply AuthReply
-	err := c.client.Call("Plugin.ProcessContents", AuthArgs{Value: val}, &reply)
+	err := c.client.Call("Plugin.Authorize", AuthArgs{Headers: headers, Body: body}, &reply)
 
 	if err != nil {
-		log.Printf("Error calling Plugin.ProcessContents: %v", err)
+		log.Printf("Error calling Plugin.Authorize: %v", err)
+		return auth.Auth{}, err
 	}
 
 	return reply.Auth, reply.Err
-}
-
-func (c *PluginClientRPC) ProcessRole(role string, val string) string {
-	var reply RoleReply
-	err := c.client.Call("Plugin.ProcessRole", RoleArgs{Role: role, Value: val}, &reply)
-
-	if err != nil {
-		log.Printf("Error calling Plugin.ProcessRole: %v", err)
-	}
-
-	return reply.Value
 }

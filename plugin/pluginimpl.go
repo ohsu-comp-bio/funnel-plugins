@@ -1,7 +1,4 @@
 // Implementation of the plugin.Plugin interface for Auth.
-//
-// Eli Bendersky [https://eli.thegreenplace.net]
-// This code is in the public domain.
 package plugin
 
 import (
@@ -10,7 +7,7 @@ import (
 	"github.com/hashicorp/go-plugin"
 )
 
-// HtmlizePlugin implements the plugin.Plugin interface to provide the RPC
+// AuthorizePlugin implements the plugin.Plugin interface to provide the RPC
 // server or client back to the plugin machinery. The server side should
 // proved the Impl field with a concrete implementation of the Auth
 // interface.

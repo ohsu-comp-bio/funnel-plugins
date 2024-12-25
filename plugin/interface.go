@@ -1,8 +1,6 @@
 package plugin
 
 import (
-	"net/http"
-
 	"example.com/auth"
 )
 
@@ -13,7 +11,7 @@ type Authorizer interface {
 	// Hooks returns a list of the hooks this plugin wants to register.
 	// Hooks can have one of the following forms:
 	//
-	//  * "contents": the plugin's ProcessContents method will be called on
+	//  * "contents": the plugin's Authorize method will be called on
 	//                the post's complete contents.
 	//
 	// * "role:NN": the plugin's ProcessRole method will be called with role=NN
@@ -21,13 +19,8 @@ type Authorizer interface {
 	//              input.
 	Hooks() []string
 
-	// ProcessRole is called on roles the plugin requested in the list returned
-	// by Hooks(). It takes the role name, role value in the input and the post
-	// and should return the transformed role value.
-	ProcessRole(role string, val string) string
-
-	// ProcessContents is called on the entire post contents, if requested in
+	// Authorize is called on the entire post contents, if requested in
 	// Hooks(). It takes the contents and the post and should return the
 	// transformed contents.
-	ProcessContents(request *http.Request) (auth.Auth, error)
+	Authorize(headers map[string][]string, body []byte) (auth.Auth, error)
 }

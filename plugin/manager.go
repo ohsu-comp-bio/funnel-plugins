@@ -3,9 +3,7 @@ package plugin
 
 import (
 	"fmt"
-	"net/http"
 	"os/exec"
-	"strings"
 
 	"example.com/auth"
 	"github.com/hashicorp/go-hclog"
@@ -74,11 +72,6 @@ func (m *Manager) LoadPlugins(path string) error {
 		for _, cap := range capabilities {
 			if cap == "contents" {
 				m.contentsHooks = append(m.contentsHooks, impl)
-			} else {
-				parts := strings.Split(cap, ":")
-				if len(parts) == 2 && parts[0] == "role" {
-					m.roleHooks[parts[1]] = impl
-				}
 			}
 		}
 	}
@@ -92,29 +85,20 @@ func (m *Manager) Close() {
 	}
 }
 
-// ApplyRoleHooks applies a registered plugin to the given role: name and text,
-// returning the transformed value. Only the last registered plugin is
-// applied.
-func (m *Manager) ApplyRoleHooks(rolename, roletext string) (string, error) {
-	if hook, ok := m.roleHooks[rolename]; ok {
-		return hook.ProcessRole(rolename, roletext), nil
-	} else {
-		return "", fmt.Errorf("no hook for role '%s' found", rolename)
-	}
-}
-
 // ApplyContentsHooks applies registered plugins to the given post contents,
 // returning the transformed value. All registered plugins are applied in
 // sequence to the value.
-func (m *Manager) ApplyContentsHooks(request *http.Request) auth.Auth {
-	var auth auth.Auth
-	var err error
-
+func (m *Manager) ApplyContentsHooks(headers map[string][]string, body []byte) (auth.Auth, error) {
 	for _, hook := range m.contentsHooks {
-		auth, err = hook.ProcessContents(request)
+
+		resp, err := hook.Authorize(headers, body)
+
 		if err != nil {
-			fmt.Printf("Error processing contents: %s\n", err)
+			return resp, err
 		}
+
+		return resp, nil
 	}
-	return auth
+
+	return auth.Auth{}, fmt.Errorf("No plugin found")
 }
