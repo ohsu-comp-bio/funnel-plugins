@@ -24,12 +24,32 @@ Listening on http://localhost:8080
 
 ## 2. Send Requests
 
-In another terminal, send the request using of the examples below with the required inputs —
+In another terminal, send the request using of the examples below —
+
+<details>
+ <summary>Required Inputs ⚙️</summary>
  
-| Required Input | Sent in...           | Example                                  |
-| -------------- | -------------------- | ---------------------------------------- |
-| User           | Authorization Header | `Authorization: Bearer Alyssa P. Hacker` |
-| Task           | Request Body         | `@example-tasks/hello-world.json`        |
+| Input | Sent in...           | Example                                  |
+|-------|----------------------|------------------------------------------|
+| User  | Authorization Header | `Authorization: Bearer Alyssa P. Hacker` |
+| Task  | Request Body         | `@example-tasks/hello-world.json`        |
+
+</details>
+
+<details>
+ <summary>Example Users ⚙️</summary>
+ 
+All ["Authorized" users](https://en.wikipedia.org/wiki/Structure_and_Interpretation_of_Computer_Programs#Characters) may be found in the "User Database" — [`example-users.csv`](./authorizer/example-users.csv):
+> - Alyssa P. Hacker, a Lisp hacker
+> - Ben Bitdiddle
+> - Cy D. Fect, a "reformed C programmer"
+> - Eva Lu Ator
+> - Lem E. Tweakit
+> - Louis Reasoner, a loose reasoner
+
+Here the use of a simple text file to contain users is to show how a plugin can be written and integrated into Funnel — real world use cases might involve more complex mechanisms for tracking users (e.g OAuth)...
+
+</details>
 
 ### Example: Authorized User
 
@@ -55,22 +75,11 @@ Here's an example of attempting to authenticate a user named 'Foo', representing
 Error: User Foo not found ❌
 ```
 
-# Example Users ✍️
-
-All ["Authorized" users](https://en.wikipedia.org/wiki/Structure_and_Interpretation_of_Computer_Programs#Characters) may be found in the "User Database" — [`example-users.csv`](./authorizer/example-users.csv):
-> - Alyssa P. Hacker, a Lisp hacker
-> - Ben Bitdiddle
-> - Cy D. Fect, a "reformed C programmer"
-> - Eva Lu Ator
-> - Lem E. Tweakit
-> - Louis Reasoner, a loose reasoner
-
-Here the use of a simple text file to contain users is to show how a plugin can be written and integrated into Funnel — real world use cases might involve more complex mechanisms for tracking users (e.g OAuth)...
-
 # Next Steps 🚧
-[] Add steps/docs for writing additional custom plugins to integrate with Funnel...
-[] Add sequence diagram of Server/Plugin interactions
-[] Add real world use case example/docs
+
+- [ ] Add steps/docs for writing additional custom plugins to integrate with Funnel...
+- [ ] Add sequence diagram of Server/Plugin interactions
+- [ ] Add real world use case example/docs
 
 # Additional Resources 📚
 
