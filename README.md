@@ -1,3 +1,5 @@
+[![Go](https://github.com/ohsu-comp-bio/funnel-plugins/actions/workflows/go.yml/badge.svg)](https://github.com/ohsu-comp-bio/funnel-plugins/actions/workflows/go.yml)
+
 > Adapted from [*RPC-based plugins in Go*](https://eli.thegreenplace.net/2023/rpc-based-plugins-in-go) by [Eli Bendersky](https://eli.thegreenplace.net/) and [go-plugin examples](https://github.com/hashicorp/go-plugin/tree/main/examples/basic) 🚀
 
 # Overview ⚙️
