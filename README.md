@@ -1,6 +1,6 @@
 [![Go](https://github.com/ohsu-comp-bio/funnel-plugins/actions/workflows/go.yml/badge.svg)](https://github.com/ohsu-comp-bio/funnel-plugins/actions/workflows/go.yml)
 [![Project license](https://img.shields.io/github/license/ohsu-comp-bio/funnel-plugins.svg)](LICENSE)
-[![Coded with love by ohsu-comp-bio](https://img.shields.io/badge/Coded%20with%20%E2%99%A5%20by-OHSU-blue)](https://github.com/oshu-comp-bio)
+[![Coded with love by ohsu-comp-bio](https://img.shields.io/badge/Coded%20with%20%E2%99%A5%20by-OHSU-blue)](https://github.com/ohsu-comp-bio)
 
 </div>
 
