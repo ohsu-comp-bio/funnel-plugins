@@ -59,7 +59,7 @@ Here the use of a simple text file to contain users is to show how a plugin can 
 
 ### Example: Authorized User
 
-Here we send a request to authenticate a user named 'Alyssa P. Hacker' who is an `Authorized` user:
+Here we send a request to authenticate a user named 'Alyssa P. Hacker' who is an `Authorized` user (i.e. found in the "User Database" — [`example-users.csv`](./authorizer/example-users.csv)):
 
 ```console
 ➜ curl --header "Authorization: Bearer Alyssa P. Hacker" \
