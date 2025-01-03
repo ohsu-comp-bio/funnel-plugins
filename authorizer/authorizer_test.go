@@ -1,39 +1,44 @@
 package main
 
 import (
-	"bytes"
-	"io"
+	"encoding/json"
 	"net/http"
 	"os"
-	"strings"
 	"testing"
 
 	"example.com/auth"
+	"example.com/tes"
 )
 
-func readExampleTask(filename string) []byte {
+func readExampleTask(filename string) tes.TesTask {
 	data, err := os.ReadFile(filename)
 	if err != nil {
 		panic(err)
 	}
-	return data
+
+	var task tes.TesTask
+	err = json.Unmarshal(data, &task)
+	if err != nil {
+		return tes.TesTask{}
+	}
+
+	return task
 }
 
-func TestProcessContents_ValidUser(t *testing.T) {
+func TestValidUser(t *testing.T) {
 	// Setup test file
 	os.Setenv("EXAMPLE_USERS", "example-users.csv")
 
 	// Read example task
-	taskData := readExampleTask("../example-tasks/hello-world.json")
+	task := readExampleTask("../example-tasks/hello-world.json")
 
-	// Create a sample HTTP request
-	req, _ := http.NewRequest("POST", "/", bytes.NewBuffer(taskData))
-	req.Header.Set("Authorization", "Bearer Alyssa P. Hacker")
-	req.Header.Set("Content-Type", "application/json")
+	// Create an Authorization Header to pass to the authorizer
+	authHeader := http.Header{
+		"Authorization": []string{"Bearer Alyssa P. Hacker"},
+	}
 
 	authenticator := ExampleAuthorizer{}
-	body, _ := io.ReadAll(req.Body)
-	resp, err := authenticator.Authorize(req.Header, body)
+	resp, err := authenticator.Authorize(authHeader, task)
 
 	if err != nil {
 		t.Fatalf("Expected no error, got %v", err)
@@ -51,52 +56,60 @@ func TestProcessContents_ValidUser(t *testing.T) {
 	}
 }
 
-func TestProcessContents_InvalidHeader(t *testing.T) {
-	// Read example task
-	taskData := readExampleTask("../example-tasks/hello-world.json")
-	req, _ := http.NewRequest("POST", "/", bytes.NewBuffer(taskData))
-	req.Header.Set("Authorization", "InvalidHeader")
-	req.Header.Set("Content-Type", "application/json")
-
-	authenticator := ExampleAuthorizer{}
-	body, _ := io.ReadAll(req.Body)
-	_, err := authenticator.Authorize(req.Header, body)
-
-	if err == nil || !strings.Contains(err.Error(), "Invalid Authorization header") {
-		t.Errorf("Expected error about invalid header, got %v", err)
-	}
-}
-
-func TestProcessContents_NoHeader(t *testing.T) {
-	// Read example task
-	taskData := readExampleTask("../example-tasks/hello-world.json")
-	req, _ := http.NewRequest("POST", "/", bytes.NewBuffer(taskData))
-	req.Header.Set("Content-Type", "application/json")
-
-	authenticator := ExampleAuthorizer{}
-	body, _ := io.ReadAll(req.Body)
-	_, err := authenticator.Authorize(req.Header, body)
-
-	if err == nil || !strings.Contains(err.Error(), "No Authorization header found") {
-		t.Errorf("Expected error about missing header, got %v", err)
-	}
-}
-
-func TestProcessContents_UserNotFound(t *testing.T) {
+func TestInvalidUser(t *testing.T) {
 	// Setup test file
 	os.Setenv("EXAMPLE_USERS", "example-users.csv")
 
 	// Read example task
-	taskData := readExampleTask("../example-tasks/hello-world.json")
-	req, _ := http.NewRequest("POST", "/", bytes.NewBuffer(taskData))
-	req.Header.Set("Authorization", "Bearer unknownuser")
-	req.Header.Set("Content-Type", "application/json")
+	task := readExampleTask("../example-tasks/hello-world.json")
+
+	// Create an Authorization Header to pass to the authorizer
+	authHeader := http.Header{
+		"Authorization": []string{"Bearer Foo"},
+	}
 
 	authenticator := ExampleAuthorizer{}
-	body, _ := io.ReadAll(req.Body)
-	_, err := authenticator.Authorize(req.Header, body)
+	_, err := authenticator.Authorize(authHeader, task)
 
-	if err == nil || !strings.Contains(err.Error(), "User unknownuser not found") {
-		t.Errorf("Expected error about user not found, got %v", err)
+	if err == nil {
+		t.Fatalf("Expected 401 Unauthorized error, got %v", err)
+	}
+}
+
+func TestInvalidAuthHeader(t *testing.T) {
+	// Setup test file
+	os.Setenv("EXAMPLE_USERS", "example-users.csv")
+
+	// Read example task
+	task := readExampleTask("../example-tasks/hello-world.json")
+
+	// Create an Authorization Header to pass to the authorizer
+	authHeader := http.Header{
+		"Authorization": []string{"Basic Alyssa P. Hacker"},
+	}
+
+	authenticator := ExampleAuthorizer{}
+	_, err := authenticator.Authorize(authHeader, task)
+
+	if err == nil {
+		t.Fatalf("Expected 401 Unauthorized error, got %v", err)
+	}
+}
+
+func TestMissingAuthHeader(t *testing.T) {
+	// Setup test file
+	os.Setenv("EXAMPLE_USERS", "example-users.csv")
+
+	// Read example task
+	task := readExampleTask("../example-tasks/hello-world.json")
+
+	// Create an Authorization Header to pass to the authorizer
+	authHeader := http.Header{}
+
+	authenticator := ExampleAuthorizer{}
+	_, err := authenticator.Authorize(authHeader, task)
+
+	if err == nil {
+		t.Fatalf("Expected 401 Unauthorized error, got %v", err)
 	}
 }

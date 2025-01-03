@@ -3,9 +3,11 @@ package plugin
 
 import (
 	"fmt"
+	"net/http"
 	"os/exec"
 
 	"example.com/auth"
+	"example.com/tes"
 	"github.com/hashicorp/go-hclog"
 	goplugin "github.com/hashicorp/go-plugin"
 )
@@ -88,10 +90,10 @@ func (m *Manager) Close() {
 // ApplyContentsHooks applies registered plugins to the given post contents,
 // returning the transformed value. All registered plugins are applied in
 // sequence to the value.
-func (m *Manager) ApplyContentsHooks(headers map[string][]string, body []byte) (auth.Auth, error) {
+func (m *Manager) ApplyContentsHooks(authHeader http.Header, task tes.TesTask) (auth.Auth, error) {
 	for _, hook := range m.contentsHooks {
 
-		resp, err := hook.Authorize(headers, body)
+		resp, err := hook.Authorize(authHeader, task)
 
 		if err != nil {
 			return resp, err

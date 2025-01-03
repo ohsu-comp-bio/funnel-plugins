@@ -1,7 +1,10 @@
 package plugin
 
 import (
+	"net/http"
+
 	"example.com/auth"
+	"example.com/tes"
 )
 
 // Auth is the interface plugins have to implement. To avoid calling the
@@ -22,5 +25,5 @@ type Authorizer interface {
 	// Authorize is called on the entire post contents, if requested in
 	// Hooks(). It takes the contents and the post and should return the
 	// transformed contents.
-	Authorize(headers map[string][]string, body []byte) (auth.Auth, error)
+	Authorize(authHeader http.Header, task tes.TesTask) (auth.Auth, error)
 }

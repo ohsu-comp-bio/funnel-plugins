@@ -7,6 +7,7 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
 	"io"
 	"log"
@@ -17,6 +18,7 @@ import (
 
 	"example.com/auth"
 	"example.com/plugin"
+	"example.com/tes"
 )
 
 func main() {
@@ -39,8 +41,8 @@ func main() {
 
 // authorize turns the text of post.Contents into HTML and returns it; it uses
 // the plugin manager to invoke loaded plugins on the contents within it.
-func authorize(pm *plugin.Manager, headers map[string][]string, body []byte) (auth.Auth, error) {
-	return pm.ApplyContentsHooks(headers, body)
+func authorize(pm *plugin.Manager, authHeader http.Header, task tes.TesTask) (auth.Auth, error) {
+	return pm.ApplyContentsHooks(authHeader, task)
 }
 
 func getRoot(w http.ResponseWriter, r *http.Request) {
@@ -51,7 +53,7 @@ func getRoot(w http.ResponseWriter, r *http.Request) {
 	}
 	defer pm.Close()
 
-	headers := r.Header
+	header := r.Header
 
 	body, err := io.ReadAll(r.Body)
 	if err != nil {
@@ -59,7 +61,14 @@ func getRoot(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	resp, err := authorize(&pm, headers, body)
+	var task tes.TesTask
+	err = json.Unmarshal(body, &task)
+	if err != nil {
+		http.Error(w, "Failed to unmarshal request body into TES task", http.StatusInternalServerError)
+		return
+	}
+
+	resp, err := authorize(&pm, header, task)
 
 	if err != nil {
 		fmt.Fprintf(w, "Error: %v ❌\n", err)

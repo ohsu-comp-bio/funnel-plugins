@@ -3,8 +3,8 @@ package main
 import (
 	"bufio"
 	"context"
-	"encoding/json"
 	"fmt"
+	"net/http"
 	"os"
 	"strings"
 
@@ -22,41 +22,33 @@ func (ExampleAuthorizer) Hooks() []string {
 	return []string{"contents"}
 }
 
-func (ExampleAuthorizer) Authorize(headers map[string][]string, body []byte) (auth.Auth, error) {
+func (ExampleAuthorizer) Authorize(authHeader http.Header, task tes.TesTask) (auth.Auth, error) {
 	// TOOD: Currently we're just using the first Authorization header in the request
 	// How might we support multiple Authorization headers?
-	if len(headers["Authorization"]) == 0 {
+	if authHeader == nil {
 		return auth.Auth{}, fmt.Errorf("No Authorization header found")
 	}
-	authHeader := headers["Authorization"][0]
 
-	// Assuming the Authorization header is in the format "Bearer <username>"
-	parts := strings.SplitN(authHeader, " ", 2)
-	if len(parts) != 2 || parts[0] != "Bearer" {
-		return auth.Auth{}, fmt.Errorf("Invalid Authorization header '%v'", authHeader)
+	user := authHeader.Get("Authorization")
+	if user == "" {
+		return auth.Auth{}, fmt.Errorf("No user found in Authorization header %s", user)
 	}
 
-	user, err := ExampleAuthorizer{}.getUser(parts[1])
+	if !strings.HasPrefix(user, "Bearer ") {
+		return auth.Auth{}, fmt.Errorf("Invalid Authorization header: expected 'Bearer <token>', got %s", user)
+	}
+
+	user = strings.TrimPrefix(user, "Bearer ")
+
+	creds, err := ExampleAuthorizer{}.getUser(user)
 	if err != nil {
+		log.Info(context.Background(), "401: User Unauthorized", "user", user)
 		return auth.Auth{}, err
 	}
 
-	// Deserialize the task from the request body and check for Task-specific auth info
-	if len(body) == 0 {
-		return user, fmt.Errorf("No task found in the request body")
-	}
+	log.Info(context.Background(), "200: User Authorized", "user", creds.User)
 
-	var task tes.TesTask
-	err = json.Unmarshal(body, &task)
-	if err != nil {
-		return auth.Auth{}, fmt.Errorf("Error unmarshalling request body into TES Task: %v", err)
-	}
-
-	// TODO: Add Task-specific authorization logic here
-
-	log.Info(context.Background(), "User authenticated", "user", user.User)
-
-	return user, nil
+	return creds, nil
 }
 
 func (ExampleAuthorizer) getUser(user string) (auth.Auth, error) {

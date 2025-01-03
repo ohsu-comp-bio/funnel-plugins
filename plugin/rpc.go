@@ -6,9 +6,11 @@ package plugin
 
 import (
 	"log"
+	"net/http"
 	"net/rpc"
 
 	"example.com/auth"
+	"example.com/tes"
 )
 
 // Types for RPC args/reply messages.
@@ -20,8 +22,8 @@ type HooksReply struct {
 }
 
 type AuthArgs struct {
-	Headers map[string][]string
-	Body    []byte
+	AuthHeader http.Header
+	Task       tes.TesTask
 }
 
 type AuthReply struct {
@@ -41,7 +43,7 @@ func (s *PluginServerRPC) Hooks(args HooksArgs, reply *HooksReply) error {
 }
 
 func (s *PluginServerRPC) Authorize(args AuthArgs, reply *AuthReply) error {
-	reply.Auth, reply.Err = s.Impl.Authorize(args.Headers, args.Body)
+	reply.Auth, reply.Err = s.Impl.Authorize(args.AuthHeader, args.Task)
 	return reply.Err
 }
 
@@ -60,9 +62,9 @@ func (c *PluginClientRPC) Hooks() []string {
 	return reply.Hooks
 }
 
-func (c *PluginClientRPC) Authorize(headers map[string][]string, body []byte) (auth.Auth, error) {
+func (c *PluginClientRPC) Authorize(authHeader http.Header, task tes.TesTask) (auth.Auth, error) {
 	var reply AuthReply
-	err := c.client.Call("Plugin.Authorize", AuthArgs{Headers: headers, Body: body}, &reply)
+	err := c.client.Call("Plugin.Authorize", AuthArgs{AuthHeader: authHeader, Task: task}, &reply)
 
 	if err != nil {
 		log.Printf("Error calling Plugin.Authorize: %v", err)
