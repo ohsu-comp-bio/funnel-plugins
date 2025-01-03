@@ -89,8 +89,8 @@ Error: User Foo not found ❌
 
 # Next Steps 🚧
 
+- [x] Add sequence diagram of Server/Plugin interactions
 - [ ] Add steps/docs for writing additional custom plugins to integrate with Funnel...
-- [ ] Add sequence diagram of Server/Plugin interactions
 - [ ] Add real world use case example/docs
 
 # Additional Resources 📚
