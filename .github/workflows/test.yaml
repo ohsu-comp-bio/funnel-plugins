@@ -7,8 +7,8 @@ on:
       - main
 
 jobs:
-  lint:
-    name: lint
+  test:
+    name: Build + Test
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v4
@@ -23,10 +23,12 @@ jobs:
 
         ./server &
         
-        curl --header "Authorization: Bearer Alyssa P. Hacker" \
+        # TODO: Capture output and compare with expected output
+        
+        curl --silent --header "Authorization: Bearer Alyssa P. Hacker" \
              --data @example-tasks/hello-world.json \
              http://localhost:8080
 
-        curl --header "Authorization: Bearer Foo" \
+        curl --silent --header "Authorization: Bearer Foo" \
              --data @example-tasks/hello-world.json \
              http://localhost:8080
