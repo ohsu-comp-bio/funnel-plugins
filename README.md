@@ -12,6 +12,12 @@ This repo contains Funnel Plugin development using the [`go-plugin`](https://git
 
 In this setup, the Plugin handles all user authentication, with the Server having no "knowledge" or record of user credentials/tokens (e.g. [`example-users.csv`](./authorizer/example-users.csv)).
 
+## Sequence Diagram
+
+> Created with https://sequencediagram.org ([_source_](./sequence-diagram.txt))
+
+![proposed-auth-design](./sequence-diagram.png)
+
 # Quick Start ⚡
 
 ## 1. Start the Server 
