@@ -14,7 +14,7 @@ In this setup, the Plugin handles all user authentication, with the Server havin
 
 ## Sequence Diagram
 
-> Created with https://sequencediagram.org ([_source_](./sequence-diagram.txt))
+> Created with https://sequencediagram.org ([_source_](https://github.com/ohsu-comp-bio/funnel/blob/feature/plugins/plugins/sequence-diagram.txt))
 
 ![proposed-auth-design](./sequence-diagram.png)
 
@@ -25,7 +25,7 @@ In this setup, the Plugin handles all user authentication, with the Server havin
 ```console
 ➜ git clone https://github.com/ohsu-comp-bio/funnel-plugins
 
-➜ cd funnle-plugins
+➜ cd funnel-plugins
 
 ➜ make
 Building ./server...OK
@@ -51,7 +51,7 @@ In another terminal, send the request using of the examples below —
 <details>
  <summary>Example Users ⚙️</summary>
  
-All ["Authorized" users](https://en.wikipedia.org/wiki/Structure_and_Interpretation_of_Computer_Programs#Characters) may be found in the "User Database" — [`example-users.csv`](./authorizer/example-users.csv):
+All ["Authorized" users](https://en.wikipedia.org/wiki/Structure_and_Interpretation_of_Computer_Programs#Characters) may be found in the "User Database" — [`example-users.csv`](https://github.com/ohsu-comp-bio/funnel/blob/feature/plugins/plugins/example-users.csv):
 > - Alyssa P. Hacker, a Lisp hacker
 > - Ben Bitdiddle
 > - Cy D. Fect, a "reformed C programmer"
@@ -65,7 +65,7 @@ Here the use of a simple text file to contain users is to show how a plugin can 
 
 ### Example: Authorized User
 
-Here we send a request to authenticate a user named 'Alyssa P. Hacker' who is an `Authorized` user (i.e. found in the "User Database" — [`example-users.csv`](./authorizer/example-users.csv)):
+Here we send a request to authenticate a user named 'Alyssa P. Hacker' who is an `Authorized` user (i.e. found in the "User Database" — [`example-users.csv`](example-users.csv)):
 
 ```console
 ➜ curl --header "Authorization: Bearer Alyssa P. Hacker" \
@@ -89,9 +89,11 @@ Error: User Foo not found ❌
 
 # Next Steps 🚧
 
-- [x] Add sequence diagram of Server/Plugin interactions
+- [ ] Add Server integration
+- [ ] Add updated sequence diagram of Server/Plugin interactions
 - [ ] Add steps/docs for writing additional custom plugins to integrate with Funnel...
 - [ ] Add real world use case example/docs
+- [ ] Add expected use cases, examples, and docs
 
 # Additional Resources 📚
 
