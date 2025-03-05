@@ -23,7 +23,7 @@ type HooksReply struct {
 
 type AuthArgs struct {
 	AuthHeader http.Header
-	Task       tes.TesTask
+	Task       tes.Task
 }
 
 type AuthReply struct {
@@ -62,7 +62,7 @@ func (c *PluginClientRPC) Hooks() []string {
 	return reply.Hooks
 }
 
-func (c *PluginClientRPC) Authorize(authHeader http.Header, task tes.TesTask) (auth.Auth, error) {
+func (c *PluginClientRPC) Authorize(authHeader http.Header, task tes.Task) (auth.Auth, error) {
 	var reply AuthReply
 	err := c.client.Call("Plugin.Authorize", AuthArgs{AuthHeader: authHeader, Task: task}, &reply)
 

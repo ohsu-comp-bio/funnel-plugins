@@ -90,7 +90,7 @@ func (m *Manager) Close() {
 // ApplyContentsHooks applies registered plugins to the given post contents,
 // returning the transformed value. All registered plugins are applied in
 // sequence to the value.
-func (m *Manager) ApplyContentsHooks(authHeader http.Header, task tes.TesTask) (auth.Auth, error) {
+func (m *Manager) ApplyContentsHooks(authHeader http.Header, task tes.Task) (auth.Auth, error) {
 	for _, hook := range m.contentsHooks {
 
 		resp, err := hook.Authorize(authHeader, task)

@@ -41,7 +41,7 @@ func main() {
 
 // authorize turns the text of post.Contents into HTML and returns it; it uses
 // the plugin manager to invoke loaded plugins on the contents within it.
-func authorize(pm *plugin.Manager, authHeader http.Header, task tes.TesTask) (auth.Auth, error) {
+func authorize(pm *plugin.Manager, authHeader http.Header, task tes.Task) (auth.Auth, error) {
 	return pm.ApplyContentsHooks(authHeader, task)
 }
 
@@ -61,7 +61,7 @@ func getRoot(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	var task tes.TesTask
+	var task tes.Task
 	err = json.Unmarshal(body, &task)
 	if err != nil {
 		http.Error(w, "Failed to unmarshal request body into TES task", http.StatusInternalServerError)

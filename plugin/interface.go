@@ -25,5 +25,5 @@ type Authorizer interface {
 	// Authorize is called on the entire post contents, if requested in
 	// Hooks(). It takes the contents and the post and should return the
 	// transformed contents.
-	Authorize(authHeader http.Header, task tes.TesTask) (auth.Auth, error)
+	Authorize(authHeader http.Header, task tes.Task) (auth.Auth, error)
 }
