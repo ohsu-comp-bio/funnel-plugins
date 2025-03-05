@@ -1,6 +1,7 @@
 package main
 
 import (
+	"bytes"
 	"encoding/json"
 	"net/http"
 	"os"
@@ -10,16 +11,16 @@ import (
 	"example.com/tes"
 )
 
-func readExampleTask(filename string) tes.TesTask {
+func readExampleTask(filename string) tes.Task {
 	data, err := os.ReadFile(filename)
 	if err != nil {
 		panic(err)
 	}
 
-	var task tes.TesTask
+	var task tes.Task
 	err = json.Unmarshal(data, &task)
 	if err != nil {
-		return tes.TesTask{}
+		return tes.Task{}
 	}
 
 	return task
@@ -31,28 +32,35 @@ func TestValidUser(t *testing.T) {
 
 	// Read example task
 	task := readExampleTask("../example-tasks/hello-world.json")
+	taskData, _ := json.Marshal(task)
 
 	// Create an Authorization Header to pass to the authorizer
-	authHeader := http.Header{
-		"Authorization": []string{"Bearer Alyssa P. Hacker"},
-	}
-
-	authenticator := ExampleAuthorizer{}
-	resp, err := authenticator.Authorize(authHeader, task)
+	req, _ := http.NewRequest("POST", "http://localhost:8080/s3", bytes.NewBuffer(taskData))
+	req.Header.Set("Authorization", "Bearer Alyssa P. Hacker")
+	client := &http.Client{}
+	resp, err := client.Do(req)
 
 	if err != nil {
 		t.Fatalf("Expected no error, got %v", err)
 	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		t.Errorf("Expected status code 200, got %v", resp.StatusCode)
+	}
+
+	var authResp auth.Auth
+	json.NewDecoder(resp.Body).Decode(&authResp)
 
 	expected := auth.Auth{
 		User:  "Alyssa P. Hacker",
 		Token: "<Alyssa's Secret>",
 	}
 
-	if resp.User != expected.User || resp.Token != expected.Token {
+	if authResp.User != expected.User || authResp.Token != expected.Token {
 		t.Errorf("Expected (%s, %s), got (%s, %s)",
 			expected.User, expected.Token,
-			resp.User, resp.Token)
+			authResp.User, authResp.Token)
 	}
 }
 
@@ -62,17 +70,21 @@ func TestInvalidUser(t *testing.T) {
 
 	// Read example task
 	task := readExampleTask("../example-tasks/hello-world.json")
+	taskData, _ := json.Marshal(task)
 
 	// Create an Authorization Header to pass to the authorizer
-	authHeader := http.Header{
-		"Authorization": []string{"Bearer Foo"},
+	req, _ := http.NewRequest("POST", "http://localhost:8080/s3", bytes.NewBuffer(taskData))
+	req.Header.Set("Authorization", "Bearer Foo")
+	client := &http.Client{}
+	resp, err := client.Do(req)
+
+	if err != nil {
+		t.Fatalf("Expected no error, got %v", err)
 	}
+	defer resp.Body.Close()
 
-	authenticator := ExampleAuthorizer{}
-	_, err := authenticator.Authorize(authHeader, task)
-
-	if err == nil {
-		t.Fatalf("Expected 401 Unauthorized error, got %v", err)
+	if resp.StatusCode != http.StatusUnauthorized {
+		t.Errorf("Expected status code 401, got %v", resp.StatusCode)
 	}
 }
 
@@ -82,17 +94,21 @@ func TestInvalidAuthHeader(t *testing.T) {
 
 	// Read example task
 	task := readExampleTask("../example-tasks/hello-world.json")
+	taskData, _ := json.Marshal(task)
 
 	// Create an Authorization Header to pass to the authorizer
-	authHeader := http.Header{
-		"Authorization": []string{"Basic Alyssa P. Hacker"},
+	req, _ := http.NewRequest("POST", "http://localhost:8080/s3", bytes.NewBuffer(taskData))
+	req.Header.Set("Authorization", "Basic Alyssa P. Hacker")
+	client := &http.Client{}
+	resp, err := client.Do(req)
+
+	if err != nil {
+		t.Fatalf("Expected no error, got %v", err)
 	}
+	defer resp.Body.Close()
 
-	authenticator := ExampleAuthorizer{}
-	_, err := authenticator.Authorize(authHeader, task)
-
-	if err == nil {
-		t.Fatalf("Expected 401 Unauthorized error, got %v", err)
+	if resp.StatusCode != http.StatusUnauthorized {
+		t.Errorf("Expected status code 401, got %v", resp.StatusCode)
 	}
 }
 
@@ -102,14 +118,19 @@ func TestMissingAuthHeader(t *testing.T) {
 
 	// Read example task
 	task := readExampleTask("../example-tasks/hello-world.json")
+	taskData, _ := json.Marshal(task)
 
 	// Create an Authorization Header to pass to the authorizer
-	authHeader := http.Header{}
+	req, _ := http.NewRequest("POST", "http://localhost:8080/s3", bytes.NewBuffer(taskData))
+	client := &http.Client{}
+	resp, err := client.Do(req)
 
-	authenticator := ExampleAuthorizer{}
-	_, err := authenticator.Authorize(authHeader, task)
+	if err != nil {
+		t.Fatalf("Expected no error, got %v", err)
+	}
+	defer resp.Body.Close()
 
-	if err == nil {
-		t.Fatalf("Expected 401 Unauthorized error, got %v", err)
+	if resp.StatusCode != http.StatusUnauthorized {
+		t.Errorf("Expected status code 401, got %v", resp.StatusCode)
 	}
 }

@@ -1,11 +1,10 @@
 package main
 
 import (
-	"bufio"
 	"context"
+	"encoding/json"
 	"fmt"
 	"net/http"
-	"os"
 	"strings"
 
 	"example.com/auth"
@@ -22,7 +21,7 @@ func (ExampleAuthorizer) Hooks() []string {
 	return []string{"contents"}
 }
 
-func (ExampleAuthorizer) Authorize(authHeader http.Header, task tes.TesTask) (auth.Auth, error) {
+func (ExampleAuthorizer) Authorize(authHeader http.Header, task tes.Task) (auth.Auth, error) {
 	// TOOD: Currently we're just using the first Authorization header in the request
 	// How might we support multiple Authorization headers?
 	if authHeader == nil {
@@ -52,41 +51,24 @@ func (ExampleAuthorizer) Authorize(authHeader http.Header, task tes.TesTask) (au
 }
 
 func (ExampleAuthorizer) getUser(user string) (auth.Auth, error) {
-	// Check if the user is authorized
-	// Read the "internal" User Database
-	// Here we're just using a CSV file to represent the list of authorized users
-	// A real-world example would use a database or an external service (e.g. OAuth)
-	userFile := os.Getenv("EXAMPLE_USERS")
-	if userFile == "" {
-		log.Info(context.Background(), "EXAMPLE_USERS not set, using default example-users.csv")
-		userFile = "authorizer/example-users.csv"
-	}
-
-	file, err := os.Open(userFile)
+	// Query the external service for user authorization
+	url := fmt.Sprintf("http://localhost:8080/s3?user=%s", user)
+	resp, err := http.Get(url)
 	if err != nil {
 		return auth.Auth{}, err
 	}
-	defer file.Close()
+	defer resp.Body.Close()
 
-	scanner := bufio.NewScanner(file)
-	lineNumber := 0
-	for scanner.Scan() {
-		lineNumber++
-		line := scanner.Text()
-
-		if strings.Contains(line, user) {
-			result := strings.Split(line, ",")
-
-			auth := auth.Auth{
-				User:  result[0],
-				Token: result[1],
-			}
-
-			return auth, nil
-		}
+	if resp.StatusCode != http.StatusOK {
+		return auth.Auth{}, fmt.Errorf("User %s not found", user)
 	}
 
-	return auth.Auth{}, fmt.Errorf("User %s not found", user)
+	var creds auth.Auth
+	if err := json.NewDecoder(resp.Body).Decode(&creds); err != nil {
+		return auth.Auth{}, err
+	}
+
+	return creds, nil
 }
 
 func main() {
