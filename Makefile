@@ -2,10 +2,10 @@
 
 all: build
 
+clean:
+	rm ./plugin/authorizer
+	rm basic
+
 build:
-	@printf "Building ./server..."
-	@mkdir -p plugin-binaries
-	@go build -o ./plugin-binaries/exampleAuthorizer ./authorizer/
-	@go build -o ./server ./main.go
-	@echo "OK"
-	
+	go build -o ./plugin/authorizer ./plugin/auth_impl.go
+	go build -o basic . 

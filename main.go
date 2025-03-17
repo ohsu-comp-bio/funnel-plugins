@@ -1,78 +1,62 @@
-// Main "authorize" application that can load and register plugins from the
-// plugin-binaries directory.
-//
-// Adapted from 'RPC-based plugins in Go' (https://eli.thegreenplace.net/2023/rpc-based-plugins-in-go)
-// by Eli Bendersky (https://eli.thegreenplace.net/) 🚀
-
 package main
 
 import (
-	"encoding/json"
 	"fmt"
-	"io"
 	"log"
-	"net/http"
 	"os"
-	"os/signal"
-	"syscall"
+	"os/exec"
 
-	"example.com/auth"
-	"example.com/plugin"
-	"example.com/tes"
+	"example.com/shared"
+	hclog "github.com/hashicorp/go-hclog"
+	"github.com/hashicorp/go-plugin"
 )
 
 func main() {
-	mux := http.NewServeMux()
-	mux.HandleFunc("/", getRoot)
+	// Create an hclog.Logger
+	logger := hclog.New(&hclog.LoggerOptions{
+		Name:   "plugin",
+		Output: os.Stdout,
+		Level:  hclog.Debug,
+	})
 
-	go func() {
-		fmt.Println("Listening on http://localhost:8080")
-		if err := http.ListenAndServe(":8080", mux); err != nil {
-			log.Fatalf("Server exited: %v", err)
-		}
-	}()
+	// We're a host! Start by launching the plugin process.
+	client := plugin.NewClient(&plugin.ClientConfig{
+		HandshakeConfig: handshakeConfig,
+		Plugins:         pluginMap,
+		Cmd:             exec.Command("./plugin/authorizer"),
+		Logger:          logger,
+	})
+	defer client.Kill()
 
-	// Wait for termination signal
-	quit := make(chan os.Signal, 1)
-	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
-	<-quit
-	fmt.Println("Shutting down server...")
+	// Connect via RPC
+	rpcClient, err := client.Client()
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// Request the plugin
+	raw, err := rpcClient.Dispense("authorizer")
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	// We should have an Authorizer now! This feels like a normal interface
+	// implementation but is in fact over an RPC connection.
+	authorizer := raw.(shared.Authorizer)
+	fmt.Println(authorizer.Authorize())
 }
 
-// authorize turns the text of post.Contents into HTML and returns it; it uses
-// the plugin manager to invoke loaded plugins on the contents within it.
-func authorize(pm *plugin.Manager, authHeader http.Header, task tes.Task) (auth.Auth, error) {
-	return pm.ApplyContentsHooks(authHeader, task)
+// handshakeConfigs are used to just do a basic handshake between
+// a plugin and host. If the handshake fails, a user friendly error is shown.
+// This prevents users from executing bad plugins or executing a plugin
+// directory. It is a UX feature, not a security feature.
+var handshakeConfig = plugin.HandshakeConfig{
+	ProtocolVersion:  1,
+	MagicCookieKey:   "BASIC_PLUGIN",
+	MagicCookieValue: "hello",
 }
 
-func getRoot(w http.ResponseWriter, r *http.Request) {
-	// Load plugins from the plugin-binaries directory.
-	var pm plugin.Manager
-	if err := (&pm).LoadPlugins("./plugin-binaries/"); err != nil {
-		log.Fatal("loading plugins:", err)
-	}
-	defer pm.Close()
-
-	header := r.Header
-
-	body, err := io.ReadAll(r.Body)
-	if err != nil {
-		http.Error(w, "Failed to read request body", http.StatusInternalServerError)
-		return
-	}
-
-	var task tes.Task
-	err = json.Unmarshal(body, &task)
-	if err != nil {
-		http.Error(w, "Failed to unmarshal request body into TES task", http.StatusInternalServerError)
-		return
-	}
-
-	resp, err := authorize(&pm, header, task)
-
-	if err != nil {
-		fmt.Fprintf(w, "Error: %v ❌\n", err)
-	} else {
-		fmt.Fprintf(w, "Response: %v ✅\n", resp)
-	}
+// pluginMap is the map of plugins we can dispense.
+var pluginMap = map[string]plugin.Plugin{
+	"authorizer": &shared.AuthorizerPlugin{},
 }

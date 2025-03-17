@@ -1,0 +1,20 @@
+syntax = "proto3";
+
+package plugin;
+
+option go_package = "github.com/ohsu-comp-bio/funnel-plugins/pluginpb";
+
+service PluginService {
+  rpc Authorize(AuthRequest) returns (AuthResponse);
+}
+
+message AuthRequest {
+  string auth_header = 1;
+  string task_id = 2;
+}
+
+message AuthResponse {
+  string user = 1;
+  bool authorized = 2;
+}
+
