@@ -19,124 +19,87 @@ import (
 const _ = grpc.SupportPackageIsVersion7
 
 const (
-	KV_Get_FullMethodName = "/proto.KV/Get"
-	KV_Put_FullMethodName = "/proto.KV/Put"
+	Authorize_Get_FullMethodName = "/proto.Authorize/Get"
 )
 
-// KVClient is the client API for KV service.
+// AuthorizeClient is the client API for Authorize service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
-type KVClient interface {
+type AuthorizeClient interface {
 	Get(ctx context.Context, in *GetRequest, opts ...grpc.CallOption) (*GetResponse, error)
-	Put(ctx context.Context, in *PutRequest, opts ...grpc.CallOption) (*Empty, error)
 }
 
-type kVClient struct {
+type authorizeClient struct {
 	cc grpc.ClientConnInterface
 }
 
-func NewKVClient(cc grpc.ClientConnInterface) KVClient {
-	return &kVClient{cc}
+func NewAuthorizeClient(cc grpc.ClientConnInterface) AuthorizeClient {
+	return &authorizeClient{cc}
 }
 
-func (c *kVClient) Get(ctx context.Context, in *GetRequest, opts ...grpc.CallOption) (*GetResponse, error) {
+func (c *authorizeClient) Get(ctx context.Context, in *GetRequest, opts ...grpc.CallOption) (*GetResponse, error) {
 	out := new(GetResponse)
-	err := c.cc.Invoke(ctx, KV_Get_FullMethodName, in, out, opts...)
+	err := c.cc.Invoke(ctx, Authorize_Get_FullMethodName, in, out, opts...)
 	if err != nil {
 		return nil, err
 	}
 	return out, nil
 }
 
-func (c *kVClient) Put(ctx context.Context, in *PutRequest, opts ...grpc.CallOption) (*Empty, error) {
-	out := new(Empty)
-	err := c.cc.Invoke(ctx, KV_Put_FullMethodName, in, out, opts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-// KVServer is the server API for KV service.
-// All implementations should embed UnimplementedKVServer
+// AuthorizeServer is the server API for Authorize service.
+// All implementations should embed UnimplementedAuthorizeServer
 // for forward compatibility
-type KVServer interface {
+type AuthorizeServer interface {
 	Get(context.Context, *GetRequest) (*GetResponse, error)
-	Put(context.Context, *PutRequest) (*Empty, error)
 }
 
-// UnimplementedKVServer should be embedded to have forward compatible implementations.
-type UnimplementedKVServer struct {
+// UnimplementedAuthorizeServer should be embedded to have forward compatible implementations.
+type UnimplementedAuthorizeServer struct {
 }
 
-func (UnimplementedKVServer) Get(context.Context, *GetRequest) (*GetResponse, error) {
+func (UnimplementedAuthorizeServer) Get(context.Context, *GetRequest) (*GetResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Get not implemented")
 }
-func (UnimplementedKVServer) Put(context.Context, *PutRequest) (*Empty, error) {
-	return nil, status.Errorf(codes.Unimplemented, "method Put not implemented")
-}
 
-// UnsafeKVServer may be embedded to opt out of forward compatibility for this service.
-// Use of this interface is not recommended, as added methods to KVServer will
+// UnsafeAuthorizeServer may be embedded to opt out of forward compatibility for this service.
+// Use of this interface is not recommended, as added methods to AuthorizeServer will
 // result in compilation errors.
-type UnsafeKVServer interface {
-	mustEmbedUnimplementedKVServer()
+type UnsafeAuthorizeServer interface {
+	mustEmbedUnimplementedAuthorizeServer()
 }
 
-func RegisterKVServer(s grpc.ServiceRegistrar, srv KVServer) {
-	s.RegisterService(&KV_ServiceDesc, srv)
+func RegisterAuthorizeServer(s grpc.ServiceRegistrar, srv AuthorizeServer) {
+	s.RegisterService(&Authorize_ServiceDesc, srv)
 }
 
-func _KV_Get_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+func _Authorize_Get_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
 	in := new(GetRequest)
 	if err := dec(in); err != nil {
 		return nil, err
 	}
 	if interceptor == nil {
-		return srv.(KVServer).Get(ctx, in)
+		return srv.(AuthorizeServer).Get(ctx, in)
 	}
 	info := &grpc.UnaryServerInfo{
 		Server:     srv,
-		FullMethod: KV_Get_FullMethodName,
+		FullMethod: Authorize_Get_FullMethodName,
 	}
 	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(KVServer).Get(ctx, req.(*GetRequest))
+		return srv.(AuthorizeServer).Get(ctx, req.(*GetRequest))
 	}
 	return interceptor(ctx, in, info, handler)
 }
 
-func _KV_Put_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(PutRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(KVServer).Put(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: KV_Put_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(KVServer).Put(ctx, req.(*PutRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-// KV_ServiceDesc is the grpc.ServiceDesc for KV service.
+// Authorize_ServiceDesc is the grpc.ServiceDesc for Authorize service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
-var KV_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "proto.KV",
-	HandlerType: (*KVServer)(nil),
+var Authorize_ServiceDesc = grpc.ServiceDesc{
+	ServiceName: "proto.Authorize",
+	HandlerType: (*AuthorizeServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
 			MethodName: "Get",
-			Handler:    _KV_Get_Handler,
-		},
-		{
-			MethodName: "Put",
-			Handler:    _KV_Put_Handler,
+			Handler:    _Authorize_Get_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

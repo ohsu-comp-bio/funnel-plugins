@@ -1,13 +1,15 @@
-.PHONY: all build
+.PHONY: all build clean
 
 all: build
 
 clean:
-	rm kv-go-grpc
+	# Remove main CLI + Plugin
 	rm kv
+	rm authorize-go-grpc
 
 build:
 	# Build main CLI 
-	go build -o kv
+	go build -o authorize
+
 	# Build Pluigin
-	go build -o kv-go-grpc ./plugin
+	go build -o authorize-go-grpc ./plugin

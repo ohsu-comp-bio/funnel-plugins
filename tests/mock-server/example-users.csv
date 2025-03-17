@@ -1,0 +1,5 @@
+user,token
+example,<example's secret>
+foobar,<foobar's secret>
+foo,<foo's secret>
+bar,<bar's secret>

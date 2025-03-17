@@ -19,10 +19,9 @@ func run() error {
 	client := plugin.NewClient(&plugin.ClientConfig{
 		HandshakeConfig: shared.Handshake,
 		Plugins:         shared.PluginMap,
-		Cmd:             exec.Command("sh", "-c", os.Getenv("KV_PLUGIN")),
+		Cmd:             exec.Command("sh", "-c", os.Getenv("AUTHORIZE_PLUGIN")),
 		AllowedProtocols: []plugin.Protocol{
-			plugin.ProtocolNetRPC, plugin.ProtocolGRPC},
-	})
+			plugin.ProtocolNetRPC, plugin.ProtocolGRPC}})
 	defer client.Kill()
 
 	// Connect via RPC
@@ -32,33 +31,24 @@ func run() error {
 	}
 
 	// Request the plugin
-	raw, err := rpcClient.Dispense("kv_grpc")
+	raw, err := rpcClient.Dispense("authorize")
 	if err != nil {
 		return err
 	}
 
-	// We should have a KV store now! This feels like a normal interface
+	// We should have an Authorize function now! This feels like a normal interface
 	// implementation but is in fact over an RPC connection.
-	kv := raw.(shared.KV)
-	os.Args = os.Args[1:]
-	switch os.Args[0] {
-	case "get":
-		result, err := kv.Get(os.Args[1])
-		if err != nil {
-			return err
-		}
+	authorize := raw.(shared.Authorize)
 
-		fmt.Println(string(result))
-
-	case "put":
-		err := kv.Put(os.Args[1], []byte(os.Args[2]))
-		if err != nil {
-			return err
-		}
-
-	default:
-		return fmt.Errorf("Please only use 'get' or 'put', given: %q", os.Args[0])
+	if len(os.Args) < 2 {
+		return fmt.Errorf("Usage: %s <user>", os.Args[0])
 	}
+	result, err := authorize.Get(os.Args[1])
+	if err != nil {
+		return err
+	}
+
+	fmt.Println(string(result))
 
 	return nil
 }

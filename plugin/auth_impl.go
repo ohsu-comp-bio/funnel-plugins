@@ -5,30 +5,40 @@ package main
 
 import (
 	"fmt"
-	"os"
+	"io"
+	"net/http"
 
 	"example.com/shared"
 	"github.com/hashicorp/go-plugin"
 )
 
-// Here is a real implementation of KV that writes to a local file with
-// the key name and the contents are the value of the key.
-type KV struct{}
+// Here is a real implementation of Authorize that retrieves a "Secret" value for a user
+type Authorize struct{}
 
-func (KV) Put(key string, value []byte) error {
-	value = []byte(fmt.Sprintf("%s\n\nWritten from plugin-go-grpc", string(value)))
-	return os.WriteFile("kv_"+key, value, 0644)
-}
+func (Authorize) Get(user string) ([]byte, error) {
+	fmt.Println("DEBUG: user", user)
+	if user == "" {
+		return nil, fmt.Errorf("user is required (e.g. ./authorize <user>)")
+	}
+	resp, err := http.Get("http://localhost:8080/token?user=" + user)
+	if err != nil {
+		return nil, fmt.Errorf("error making request: %w", err)
+	}
+	defer resp.Body.Close()
 
-func (KV) Get(key string) ([]byte, error) {
-	return os.ReadFile("kv_" + key)
+	body, err := io.ReadAll(resp.Body)
+	if err != nil {
+		return nil, fmt.Errorf("error reading response body: %w", err)
+	}
+
+	return body, nil
 }
 
 func main() {
 	plugin.Serve(&plugin.ServeConfig{
 		HandshakeConfig: shared.Handshake,
 		Plugins: map[string]plugin.Plugin{
-			"kv": &shared.KVGRPCPlugin{Impl: &KV{}},
+			"authorize": &shared.AuthorizePlugin{Impl: &Authorize{}},
 		},
 
 		// A non-nil value here enables gRPC serving for this plugin...
