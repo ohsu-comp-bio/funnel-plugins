@@ -3,9 +3,11 @@
 all: build
 
 clean:
-	rm ./plugin/authorizer
-	rm basic
+	rm kv-go-grpc
+	rm kv
 
 build:
-	go build -o ./plugin/authorizer ./plugin/auth_impl.go
-	go build -o basic . 
+	# Build main CLI 
+	go build -o kv
+	# Build Pluigin
+	go build -o kv-go-grpc ./plugin

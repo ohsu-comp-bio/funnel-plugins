@@ -1,62 +1,76 @@
+// Copyright (c) HashiCorp, Inc.
+// SPDX-License-Identifier: MPL-2.0
+
 package main
 
 import (
 	"fmt"
+	"io"
 	"log"
 	"os"
 	"os/exec"
 
 	"example.com/shared"
-	hclog "github.com/hashicorp/go-hclog"
 	"github.com/hashicorp/go-plugin"
 )
 
-func main() {
-	// Create an hclog.Logger
-	logger := hclog.New(&hclog.LoggerOptions{
-		Name:   "plugin",
-		Output: os.Stdout,
-		Level:  hclog.Debug,
-	})
-
-	// We're a host! Start by launching the plugin process.
+func run() error {
+	// We're a host. Start by launching the plugin process.
 	client := plugin.NewClient(&plugin.ClientConfig{
-		HandshakeConfig: handshakeConfig,
-		Plugins:         pluginMap,
-		Cmd:             exec.Command("./plugin/authorizer"),
-		Logger:          logger,
+		HandshakeConfig: shared.Handshake,
+		Plugins:         shared.PluginMap,
+		Cmd:             exec.Command("sh", "-c", os.Getenv("KV_PLUGIN")),
+		AllowedProtocols: []plugin.Protocol{
+			plugin.ProtocolNetRPC, plugin.ProtocolGRPC},
 	})
 	defer client.Kill()
 
 	// Connect via RPC
 	rpcClient, err := client.Client()
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 
 	// Request the plugin
-	raw, err := rpcClient.Dispense("authorizer")
+	raw, err := rpcClient.Dispense("kv_grpc")
 	if err != nil {
-		log.Fatal(err)
+		return err
 	}
 
-	// We should have an Authorizer now! This feels like a normal interface
+	// We should have a KV store now! This feels like a normal interface
 	// implementation but is in fact over an RPC connection.
-	authorizer := raw.(shared.Authorizer)
-	fmt.Println(authorizer.Authorize())
+	kv := raw.(shared.KV)
+	os.Args = os.Args[1:]
+	switch os.Args[0] {
+	case "get":
+		result, err := kv.Get(os.Args[1])
+		if err != nil {
+			return err
+		}
+
+		fmt.Println(string(result))
+
+	case "put":
+		err := kv.Put(os.Args[1], []byte(os.Args[2]))
+		if err != nil {
+			return err
+		}
+
+	default:
+		return fmt.Errorf("Please only use 'get' or 'put', given: %q", os.Args[0])
+	}
+
+	return nil
 }
 
-// handshakeConfigs are used to just do a basic handshake between
-// a plugin and host. If the handshake fails, a user friendly error is shown.
-// This prevents users from executing bad plugins or executing a plugin
-// directory. It is a UX feature, not a security feature.
-var handshakeConfig = plugin.HandshakeConfig{
-	ProtocolVersion:  1,
-	MagicCookieKey:   "BASIC_PLUGIN",
-	MagicCookieValue: "hello",
-}
+func main() {
+	// We don't want to see the plugin logs.
+	log.SetOutput(io.Discard)
 
-// pluginMap is the map of plugins we can dispense.
-var pluginMap = map[string]plugin.Plugin{
-	"authorizer": &shared.AuthorizerPlugin{},
+	if err := run(); err != nil {
+		fmt.Printf("error: %+v\n", err)
+		os.Exit(1)
+	}
+
+	os.Exit(0)
 }
