@@ -41,7 +41,7 @@ Server is running on http://localhost:8080
 Here we invoke the CLI component request to authenticate a user named `example` who is an `Authorized` user (i.e. found in the "User Database" — [`example-users.csv`](./tests/example-users.csv)):
 
 ```sh
-➜ ./authorizer example | jq
+➜ ./authorizer example
 {
   "token": "example's secret",
   "user": "example"
@@ -53,7 +53,7 @@ Here we invoke the CLI component request to authenticate a user named `example` 
 Here we attempt to authenticate a user named `error`, representing an `Unauthorized` user:
 
 ```sh
-➜ ./authorizer error | jq
+➜ ./authorizer error
 {
   "error": "user 'error' not found"
 }
