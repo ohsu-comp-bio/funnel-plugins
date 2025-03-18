@@ -16,7 +16,6 @@ import (
 type Authorize struct{}
 
 func (Authorize) Get(user string) ([]byte, error) {
-	fmt.Println("DEBUG: user", user)
 	if user == "" {
 		return nil, fmt.Errorf("user is required (e.g. ./authorize <user>)")
 	}

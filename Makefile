@@ -21,4 +21,4 @@ build:
 
 test-server:
 	# Build test server
-	go build -o test-server ./tests/test-server
+	go build -o test-server ./tests/test-server.go
