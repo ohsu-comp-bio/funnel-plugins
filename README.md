@@ -38,7 +38,7 @@ Server is running on http://localhost:8080
 
 ## 3. Test Authorized User
 
-Here we invoke the CLI component request to authenticate a user named `example` who is an `Authorized` user (i.e. found in the "User Database" — [`example-users.csv`](./tests/example-users.csv)):
+Invoke the CLI component to authenticate a user named `example` who is an `Authorized` user (i.e. found in the "User Database" — [`example-users.csv`](./tests/example-users.csv)):
 
 ```sh
 ➜ ./authorizer example
@@ -50,7 +50,7 @@ Here we invoke the CLI component request to authenticate a user named `example` 
 
 ## 4. Test Unauthorized User
 
-Here we attempt to authenticate a user named `error`, representing an `Unauthorized` user:
+Attempt to authenticate a user named `error`, representing an `Unauthorized` user:
 
 ```sh
 ➜ ./authorizer error
