@@ -1,4 +1,4 @@
-[![Go Build + Test](https://github.com/ohsu-comp-bio/funnel-plugins/actions/workflows/go.yaml/badge.svg)](https://github.com/ohsu-comp-bio/funnel-plugins/actions/workflows/go.yaml)
+[![Go Build + Test](https://github.com/ohsu-comp-bio/funnel-plugins/actions/workflows/tests.yaml/badge.svg)](https://github.com/ohsu-comp-bio/funnel-plugins/actions/workflows/tesrs.yaml)
 [![Project license](https://img.shields.io/github/license/ohsu-comp-bio/funnel-plugins.svg)](LICENSE)
 [![Coded with love by ohsu-comp-bio](https://img.shields.io/badge/Coded%20with%20%E2%99%A5%20by-OHSU-blue)](https://github.com/ohsu-comp-bio)
 
@@ -6,94 +6,71 @@
 
 # Overview ⚙️
 
-> Adapted from [*RPC-based plugins in Go*](https://eli.thegreenplace.net/2023/rpc-based-plugins-in-go) by [Eli Bendersky](https://eli.thegreenplace.net/) and [go-plugin examples](https://github.com/hashicorp/go-plugin/tree/main/examples/basic) 🚀
+> [!NOTE]
+> Adapted from Hashicorp's [gRPC KV Plugin example](https://github.com/hashicorp/go-plugin/tree/main/examples/grpc) 🚀
 
 This repo contains Funnel Plugin development using the [`go-plugin`](https://github.com/hashicorp/go-plugin) package from [HashiCorp](https://github.com/hashicorp).
 
-In this setup, the Plugin handles all user authentication, with the Server having no "knowledge" or record of user credentials/tokens (e.g. [`example-users.csv`](./authorizer/example-users.csv)).
-
-## Sequence Diagram
-
-> Created with https://sequencediagram.org ([_source_](https://github.com/ohsu-comp-bio/funnel/blob/feature/plugins/plugins/sequence-diagram.txt))
-
-![proposed-auth-design](./sequence-diagram.png)
+In this setup, the Plugin handles all user authentication, with the Server having no knowledge or record of specific user credentials/tokens.
 
 # Quick Start ⚡
 
-## 1. Start the Server 
+## 1. Start the Test Server 
 
 ```console
 ➜ git clone https://github.com/ohsu-comp-bio/funnel-plugins
 
 ➜ cd funnel-plugins
 
+➜ make test-server
+
+➜ ./test-server
+Server is running on http://localhost:8080
+```
+
+## 2. Build the `authorizer` Plugin
+
+```sh
 ➜ make
-Building ./server...OK
 
-➜ ./server
-Listening on http://localhost:8080
+➜ export FUNNEL_PLUGIN=./authorizer-plugin
 ```
 
-## 2. Send Requests
+## 3. Get Authorized User ✅
 
-In another terminal, send the request using of the examples below —
+Here we invoke the CLI component request to authenticate a user named `example` who is an `Authorized` user (i.e. found in the "User Database" — [`example-users.csv`](./tests/example-users.csv)):
 
-<details>
- <summary>Required Inputs ⚙️</summary>
- 
-| Input | Sent in...           | Example                                  |
-|-------|----------------------|------------------------------------------|
-| User  | Authorization Header | `Authorization: Bearer Alyssa P. Hacker` |
-| Task  | Request Body         | `@example-tasks/hello-world.json`        |
-
-</details>
-
-<details>
- <summary>Example Users ⚙️</summary>
- 
-All ["Authorized" users](https://en.wikipedia.org/wiki/Structure_and_Interpretation_of_Computer_Programs#Characters) may be found in the "User Database" — [`example-users.csv`](https://github.com/ohsu-comp-bio/funnel/blob/feature/plugins/plugins/example-users.csv):
-> - Alyssa P. Hacker, a Lisp hacker
-> - Ben Bitdiddle
-> - Cy D. Fect, a "reformed C programmer"
-> - Eva Lu Ator
-> - Lem E. Tweakit
-> - Louis Reasoner, a loose reasoner
-
-Here the use of a simple text file to contain users is to show how a plugin can be written and integrated into Funnel — real world use cases might involve more complex mechanisms for tracking users (e.g OAuth)...
-
-</details>
-
-### Example: Authorized User
-
-Here we send a request to authenticate a user named 'Alyssa P. Hacker' who is an `Authorized` user (i.e. found in the "User Database" — [`example-users.csv`](example-users.csv)):
-
-```console
-➜ curl --header "Authorization: Bearer Alyssa P. Hacker" \
-       --data @example-tasks/hello-world.json \
-       http://localhost:8080
-
-Response: {Alyssa P. Hacker <Alyssa's Secret>} ✅
+```sh
+➜ ./authorizer example | jq
+{
+  "token": "example's secret",
+  "user": "example"
+}
 ```
 
-### Example: Unauthorized User
+## 4. Get Unauthorized User ❌
 
-Here's an example of attempting to authenticate a user named 'Foo', representing an `Unauthorized` user:
+Here we attempt to authenticate a user named `error`, representing an `Unauthorized` user:
 
-```console
-➜ curl --header "Authorization: Bearer Foo" \
-       --data @example-tasks/hello-world.json \
-       http://localhost:8080
-
-Error: User Foo not found ❌
+```sh
+➜ ./authorizer error | jq
+{
+  "error": "user 'error' not found"
+}
 ```
 
-# Next Steps 🚧
+# Architecture 📐
 
-- [ ] Add Server integration
-- [ ] Add updated sequence diagram of Server/Plugin interactions
-- [ ] Add steps/docs for writing additional custom plugins to integrate with Funnel...
-- [ ] Add real world use case example/docs
-- [ ] Add expected use cases, examples, and docs
+This repo contains the following major components:
+1. CLI (`authorizer-cli`) — used to manually invoke the `authorizer` plugin from the command line
+2. Plugin (`authorizer`) — the actual plugin itself that makes a call to the "external" Test Server
+3. Test Server (`test-server`) — used as a mock service to store the actual users and their tokens/credentials 
+
+# Sequence Diagram 📝
+
+> Created with https://sequencediagram.org ([_source_](https://github.com/ohsu-comp-bio/funnel/blob/feature/plugins/plugins/sequence-diagram.txt))
+
+![proposed-auth-design](./sequence-diagram.png)
 
 # Additional Resources 📚
 
