@@ -24,8 +24,4 @@ go.work.sum
 # env file
 .env
 
-plugin-binaries
-server
-authorizer
-authorizer-cli
-/test-server
+build/

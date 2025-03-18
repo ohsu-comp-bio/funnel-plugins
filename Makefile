@@ -1,24 +1,19 @@
-.PHONY: all build clean
+DIR = build
 
-all: build test-server
+.PHONY: all build clean tests
+
+all: build tests
 
 clean:
-	# Remove CLI
-	rm -f authorizer
-
-	# Remove Plugin
-	rm -f authorizer-plugin
-	
-	# Remove test server
-	rm -f test-server
+	rm -rf $(DIR)/*
 
 build:
 	# Build CLI 
-	go build -o authorizer
+	go build -o $(DIR)/cli
 
 	# Build Plugin
-	go build -o authorizer-plugin ./plugin
+	go build -o $(DIR)/plugins/authorizer ./plugin
 
-test-server:
+tests:
 	# Build test server
-	go build -o test-server ./tests/test-server.go
+	go build -o $(DIR)/test-server ./tests/test-server.go
