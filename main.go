@@ -19,7 +19,8 @@ func run() error {
 	client := plugin.NewClient(&plugin.ClientConfig{
 		HandshakeConfig: shared.Handshake,
 		Plugins:         shared.PluginMap,
-		Cmd:             exec.Command("sh", "-c", os.Getenv("AUTHORIZE_PLUGIN")),
+		Logger:          shared.Logger,
+		Cmd:             exec.Command("sh", "-c", os.Getenv("FUNNEL_PLUGIN")),
 		AllowedProtocols: []plugin.Protocol{
 			plugin.ProtocolNetRPC, plugin.ProtocolGRPC}})
 	defer client.Kill()

@@ -9,6 +9,7 @@ import (
 	"net/rpc"
 
 	"example.com/proto"
+	"github.com/hashicorp/go-hclog"
 	"github.com/hashicorp/go-plugin"
 	"google.golang.org/grpc"
 )
@@ -17,9 +18,15 @@ import (
 var Handshake = plugin.HandshakeConfig{
 	// This isn't required when using VersionedPlugins
 	ProtocolVersion:  1,
-	MagicCookieKey:   "BASIC_PLUGIN",
-	MagicCookieValue: "hello",
+	MagicCookieKey:   "AUTHORIZE_PLUGIN",
+	MagicCookieValue: "authorize",
 }
+
+// Create an hclog.Logger
+var Logger = hclog.New(&hclog.LoggerOptions{
+	Name:  "plugin",
+	Level: hclog.Warn,
+})
 
 // PluginMap is the map of plugins we can dispense.
 var PluginMap = map[string]plugin.Plugin{

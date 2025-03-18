@@ -1,15 +1,24 @@
 .PHONY: all build clean
 
-all: build
+all: build test-server
 
 clean:
-	# Remove main CLI + Plugin
-	rm kv
-	rm authorize-go-grpc
+	# Remove CLI
+	rm -f authorizer
+
+	# Remove Plugin
+	rm -f authorizer-plugin
+	
+	# Remove test server
+	rm -f test-server
 
 build:
-	# Build main CLI 
-	go build -o authorize
+	# Build CLI 
+	go build -o authorizer
 
-	# Build Pluigin
-	go build -o authorize-go-grpc ./plugin
+	# Build Plugin
+	go build -o authorizer-plugin ./plugin
+
+test-server:
+	# Build test server
+	go build -o test-server ./tests/test-server
