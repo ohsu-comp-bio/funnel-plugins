@@ -28,7 +28,7 @@ In this setup, the Plugin handles all user authentication, with the Server havin
 Server is running on http://localhost:8080
 ```
 
-## 2. Build the `authorizer` Plugin
+## 2. Build the Plugin
 
 ```sh
 ➜ make
@@ -36,7 +36,7 @@ Server is running on http://localhost:8080
 ➜ export FUNNEL_PLUGIN=./authorizer-plugin
 ```
 
-## 3. Get Authorized User ✅
+## 3. Test Authorized User
 
 Here we invoke the CLI component request to authenticate a user named `example` who is an `Authorized` user (i.e. found in the "User Database" — [`example-users.csv`](./tests/example-users.csv)):
 
@@ -48,7 +48,7 @@ Here we invoke the CLI component request to authenticate a user named `example` 
 }
 ```
 
-## 4. Get Unauthorized User ❌
+## 4. Test Unauthorized User
 
 Here we attempt to authenticate a user named `error`, representing an `Unauthorized` user:
 
