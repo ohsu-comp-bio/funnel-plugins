@@ -17,6 +17,8 @@ In this setup, the Plugin handles all user authentication, with the Server havin
 
 ## 1. Start the Test Server 
 
+First build and run the test User Database server:
+
 ```console
 ➜ git clone https://github.com/ohsu-comp-bio/funnel-plugins
 
@@ -29,6 +31,8 @@ Server is running on http://localhost:8080
 ```
 
 ## 2. Build the Plugin
+
+Then in another terminal window build the plugin and set the appropriate environmental variable to tell the application what plugin to use:
 
 ```sh
 ➜ make
