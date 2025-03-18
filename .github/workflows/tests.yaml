@@ -1,0 +1,30 @@
+name: Tests
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up Go
+      uses: actions/setup-go@v2
+      with:
+        go-version: 1.22
+
+    - name: Build
+      run: go build -v ./...
+
+    - name: Run tests
+      run: |
+        make test-server
+        ./test-server &
+        go test -v ./...

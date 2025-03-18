@@ -51,9 +51,15 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 
 // Handler for retrieving user tokens
 func tokenHandler(w http.ResponseWriter, r *http.Request) {
+	// Load users from the CSV file
+	if err := loadUsers("tests/example-users.csv"); err != nil {
+		fmt.Println("error loading users:", err)
+		return
+	}
+
 	user := r.URL.Query().Get("user")
 	if user == "" {
-		http.Error(w, `{ "error": "User is required" }`, http.StatusBadRequest)
+		http.Error(w, `{"error": "user is required"}`, http.StatusBadRequest)
 		return
 	}
 
@@ -64,16 +70,11 @@ func tokenHandler(w http.ResponseWriter, r *http.Request) {
 	if exists {
 		json.NewEncoder(w).Encode(map[string]string{"user": user, "token": token})
 	} else {
-		http.Error(w, fmt.Sprintf(`{ "error": "User %s not found" }`, user), http.StatusNotFound)
+		http.Error(w, fmt.Sprintf(`{"error": "user '%s' not found"}`, user), http.StatusNotFound)
 	}
 }
 
 func main() {
-	// Load users from the CSV file
-	if err := loadUsers("tests/example-users.csv"); err != nil {
-		fmt.Println("Error loading users:", err)
-		return
-	}
 
 	http.HandleFunc("/", indexHandler)
 	http.HandleFunc("/token", tokenHandler)
