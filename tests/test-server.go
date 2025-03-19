@@ -9,78 +9,96 @@ import (
 	"sync"
 )
 
-var (
-	userDB = make(map[string]string)
-	mutex  = &sync.RWMutex{}
-)
-
-// Load user tokens from the CSV file
-func loadUsers(filename string) error {
-	file, err := os.Open(filename)
-	if err != nil {
-		return err
-	}
-	defer file.Close()
-
-	reader := csv.NewReader(file)
-	records, err := reader.ReadAll()
-	if err != nil {
-		return err
-	}
-
-	// Assuming first row is headers
-	for i, row := range records {
-		if i == 0 {
-			continue // Skip header
-		}
-		if len(row) < 2 {
-			continue // Skip malformed rows
-		}
-		mutex.Lock()
-		userDB[row[0]] = row[1]
-		mutex.Unlock()
-	}
-	return nil
+type Response struct {
+	Code    int               `json:"code"`
+	Message string            `json:"message"`
+	Config  map[string]string `json:"config"` // Key-value pairs for configuration
 }
 
-// Handler for root endpoint
-func indexHandler(w http.ResponseWriter, r *http.Request) {
-	response := map[string]string{"message": "Hello, world! To get a token, send a GET request to /token?user=<user>"}
-	json.NewEncoder(w).Encode(response)
+type Credentials struct {
+	User   string `json:"user"`
+	Key    string `json:"key"`
+	Secret string `json:"secret"`
 }
 
-// Handler for retrieving user tokens
-func tokenHandler(w http.ResponseWriter, r *http.Request) {
-	// Load users from the CSV file
-	if err := loadUsers("tests/example-users.csv"); err != nil {
-		fmt.Println("error loading users:", err)
-		return
-	}
-
-	user := r.URL.Query().Get("user")
-	if user == "" {
-		http.Error(w, `{"error": "user is required"}`, http.StatusBadRequest)
-		return
-	}
-
-	mutex.RLock()
-	token, exists := userDB[user]
-	mutex.RUnlock()
-
-	if exists {
-		json.NewEncoder(w).Encode(map[string]string{"user": user, "token": token})
-	} else {
-		http.Error(w, fmt.Sprintf(`{"error": "user '%s' not found"}`, user), http.StatusNotFound)
-	}
+type GenericS3Storage struct {
+	Key    string
+	Secret string
 }
 
 func main() {
-
 	http.HandleFunc("/", indexHandler)
 	http.HandleFunc("/token", tokenHandler)
 
 	// Currently hardcoding the endpoint of the token service
 	// TODO: This should be made configurable similar to the plugin (see plugin/auth_impl.go)
 	fmt.Println("Server is running on http://localhost:8080")
-	http.ListenAndServe("localhost:8080", nil)
+	err := http.ListenAndServe("localhost:8080", nil)
+	if err != nil {
+		fmt.Println("Error starting server:", err)
+	}
+}
+
+// Handler for root endpoint
+func indexHandler(w http.ResponseWriter, r *http.Request) {
+	resp := Response{http.StatusOK, "Hello, world! To get a token, send a GET request to /token?user=<user>", nil}
+	json.NewEncoder(w).Encode(resp)
+}
+
+// Handler for retrieving user tokens
+func tokenHandler(w http.ResponseWriter, r *http.Request) {
+	// Load users from the CSV file
+	userDB, err := loadUsers("tests/example-users.csv")
+	if err != nil {
+		fmt.Println("Error loading users:", err)
+		return
+	}
+
+	user := r.URL.Query().Get("user")
+	if user == "" {
+		resp := Response{http.StatusBadRequest, "User is required", nil}
+		json.NewEncoder(w).Encode(resp)
+		return
+	}
+
+	token, found := userDB[user]
+
+	if found {
+		config := map[string]string{
+			"GenericS3Storage.Key":    token.Key,
+			"GenericS3Storage.Secret": token.Secret,
+		}
+		resp := Response{http.StatusOK, "User found!", config}
+		json.NewEncoder(w).Encode(resp)
+	} else {
+		resp := Response{http.StatusUnauthorized, "User not found", nil}
+		json.NewEncoder(w).Encode(resp)
+	}
+}
+
+// Load user tokens from the CSV file
+func loadUsers(filename string) (map[string]Credentials, error) {
+	file, err := os.Open(filename)
+	if err != nil {
+		return nil, fmt.Errorf("failed to open file: %w", err)
+	}
+	defer file.Close()
+
+	reader := csv.NewReader(file)
+	records, err := reader.ReadAll()
+	if err != nil {
+		return nil, fmt.Errorf("failed to read CSV: %w", err)
+	}
+
+	userDB := make(map[string]Credentials)
+	mutex := sync.RWMutex{}
+	for i, row := range records {
+		if i == 0 {
+			continue // Skip header
+		}
+		mutex.Lock()
+		userDB[row[0]] = Credentials{User: row[0], Key: row[1], Secret: row[2]}
+		mutex.Unlock()
+	}
+	return userDB, nil
 }
