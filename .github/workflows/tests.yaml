@@ -25,6 +25,6 @@ jobs:
 
     - name: Run tests
       run: |
-        make test-server
-        ./test-server &
+        make tests
+        ./build/test-server &
         go test -v ./...
