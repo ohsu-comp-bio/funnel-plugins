@@ -82,7 +82,7 @@ func tokenHandler(w http.ResponseWriter, r *http.Request) {
 		// User not found (Unauthorized: 401)
 		resp := Response{
 			Code:    http.StatusUnauthorized,
-			Message: "User not found",
+			Message: "User not authorized",
 			Config:  nil,
 		}
 		json.NewEncoder(w).Encode(resp)

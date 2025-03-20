@@ -63,7 +63,7 @@ func TestUnauthorizedUser(t *testing.T) {
 	// Define expected response
 	expected := Response{
 		Code:    401,
-		Message: "User not found",
+		Message: "User not authorized",
 	}
 
 	// Compare using reflect.DeepEqual
