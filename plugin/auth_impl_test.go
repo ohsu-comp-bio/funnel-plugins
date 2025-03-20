@@ -7,10 +7,15 @@ import (
 )
 
 // Define a struct that matches the expected JSON response
-type TokenResponse struct {
-	User  string `json:"user,omitempty"`
-	Token string `json:"token,omitempty"`
-	Error string `json:"error,omitempty"`
+type Response struct {
+	Code    int         `json:"code"`
+	Message string      `json:"message"`
+	Config  Credentials `json:"config"` // Key-value pairs for configuration
+}
+
+type Credentials struct {
+	Key    string `json:"key"`
+	Secret string `json:"secret"`
 }
 
 func TestAuthorizedUser(t *testing.T) {
@@ -21,15 +26,19 @@ func TestAuthorizedUser(t *testing.T) {
 	}
 
 	// Parse actual JSON response
-	var actual TokenResponse
+	var actual Response
 	if err := json.Unmarshal(raw, &actual); err != nil {
 		t.Fatalf("failed to parse JSON response: %v", err)
 	}
 
 	// Define expected response
-	expected := TokenResponse{
-		User:  "example",
-		Token: "example's secret",
+	expected := Response{
+		Code:    200,
+		Message: "User found!",
+		Config: Credentials{
+			Key:    "key1",
+			Secret: "secret1",
+		},
 	}
 
 	// Compare using reflect.DeepEqual
@@ -46,14 +55,16 @@ func TestUnauthorizedUser(t *testing.T) {
 	}
 
 	// Parse actual JSON response
-	var actual TokenResponse
+	var actual Response
 	if err := json.Unmarshal(raw, &actual); err != nil {
 		t.Fatalf("failed to parse JSON response: %v", err)
 	}
 
 	// Define expected response
-	expected := TokenResponse{
-		Error: "user 'error' not found",
+	expected := Response{
+		Code:    401,
+		Message: "User not found",
+		Config:  Credentials{},
 	}
 
 	// Compare using reflect.DeepEqual

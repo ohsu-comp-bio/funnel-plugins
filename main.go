@@ -1,9 +1,8 @@
-// Copyright (c) HashiCorp, Inc.
-// SPDX-License-Identifier: MPL-2.0
-
 package main
 
 import (
+	"bytes"
+	"encoding/json"
 	"fmt"
 	"os"
 
@@ -19,17 +18,24 @@ func run(user string, dir string) (string, error) {
 		return "", fmt.Errorf("failed to get client: %w", err)
 	}
 
-	result, err := authorize.Get(user)
+	resp, err := authorize.Get(user)
 	if err != nil {
 		return "", fmt.Errorf("failed to authorize: %w", err)
 	}
 
-	return string(result), nil
+	// Pretty print directly from raw JSON response
+	var out bytes.Buffer
+	if err := json.Indent(&out, resp, "", "  "); err != nil {
+		return "", fmt.Errorf("error formatting JSON: %w", err)
+	}
+
+	return out.String(), nil
 }
 
 func main() {
 	if len(os.Args) < 2 {
 		fmt.Printf("Usage: %s <user>\n", os.Args[0])
+		os.Exit(1)
 	}
 
 	out, err := run(os.Args[1], "build/plugins")

@@ -10,13 +10,12 @@ import (
 )
 
 type Response struct {
-	Code    int               `json:"code"`
-	Message string            `json:"message"`
-	Config  map[string]string `json:"config"` // Key-value pairs for configuration
+	Code    int         `json:"code"`
+	Message string      `json:"message"`
+	Config  Credentials `json:"config"` // Key-value pairs for configuration
 }
 
 type Credentials struct {
-	User   string `json:"user"`
 	Key    string `json:"key"`
 	Secret string `json:"secret"`
 }
@@ -41,7 +40,11 @@ func main() {
 
 // Handler for root endpoint
 func indexHandler(w http.ResponseWriter, r *http.Request) {
-	resp := Response{http.StatusOK, "Hello, world! To get a token, send a GET request to /token?user=<user>", nil}
+	resp := Response{
+		Code:    http.StatusOK,
+		Message: "Hello, world! To get a token, send a GET request to /token?user=<user>",
+		Config:  Credentials{},
+	}
 	json.NewEncoder(w).Encode(resp)
 }
 
@@ -55,8 +58,14 @@ func tokenHandler(w http.ResponseWriter, r *http.Request) {
 	}
 
 	user := r.URL.Query().Get("user")
+
+	// No user provided in the query (Bad Request: 400)
 	if user == "" {
-		resp := Response{http.StatusBadRequest, "User is required", nil}
+		resp := Response{
+			Code:    http.StatusBadRequest,
+			Message: "User is required",
+			Config:  Credentials{},
+		}
 		json.NewEncoder(w).Encode(resp)
 		return
 	}
@@ -64,14 +73,23 @@ func tokenHandler(w http.ResponseWriter, r *http.Request) {
 	token, found := userDB[user]
 
 	if found {
-		config := map[string]string{
-			"GenericS3Storage.Key":    token.Key,
-			"GenericS3Storage.Secret": token.Secret,
+		// User found (OK: 200)
+		resp := Response{
+			Code:    http.StatusOK,
+			Message: "User found!",
+			Config: Credentials{
+				Key:    token.Key,
+				Secret: token.Secret,
+			},
 		}
-		resp := Response{http.StatusOK, "User found!", config}
 		json.NewEncoder(w).Encode(resp)
 	} else {
-		resp := Response{http.StatusUnauthorized, "User not found", nil}
+		// User not found (Unauthorized: 401)
+		resp := Response{
+			Code:    http.StatusUnauthorized,
+			Message: "User not found",
+			Config:  Credentials{},
+		}
 		json.NewEncoder(w).Encode(resp)
 	}
 }
@@ -97,7 +115,10 @@ func loadUsers(filename string) (map[string]Credentials, error) {
 			continue // Skip header
 		}
 		mutex.Lock()
-		userDB[row[0]] = Credentials{User: row[0], Key: row[1], Secret: row[2]}
+		userDB[row[0]] = Credentials{
+			Key:    row[1],
+			Secret: row[2],
+		}
 		mutex.Unlock()
 	}
 	return userDB, nil
