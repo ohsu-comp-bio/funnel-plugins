@@ -15,7 +15,7 @@ In this setup, the Plugin handles all user authentication, with the Server havin
 
 # Quick Start ⚡
 
-## 1. Start the Test Server 
+## 1. Build the Plugin and Test Server
 
 First build and run the test User Database server:
 
@@ -24,31 +24,38 @@ First build and run the test User Database server:
 
 ➜ cd funnel-plugins
 
-➜ make test-server
+➜ make
+```
 
+> [!TIP]
+> This will create three executable binaries in the `build` directory:
+>
+> | Executable           | Description                                                                  |
+> | -------------------- | ---------------------------------------------------------------------------- |
+> | `cli`                | the "application" used for invoking the plugin binary                        |
+> | `test-server`        | the Test Server used for storing user and credentials (called by the plugin) |
+> | `plugins/authorizer` | the plugin binary                                                            |
+
+## 2. Start the Test Server 
+
+```sh
 ➜ ./test-server
 Server is running on http://localhost:8080
 ```
 
-## 2. Build the Plugin
-
-Then in another terminal window build the plugin and set the appropriate environmental variable to tell the application what plugin to use:
-
-```sh
-➜ make
-
-➜ export FUNNEL_PLUGIN=./authorizer-plugin
-```
-
 ## 3. Test Authorized User
 
-Invoke the CLI component to authenticate a user named `example` who is an `Authorized` user (i.e. found in the "User Database" — [`example-users.csv`](./tests/example-users.csv)):
+Then in another terminal window, invoke the CLI component to authenticate a user named `example` who is an `Authorized` user (i.e. found in the "User Database" — [`example-users.csv`](./tests/example-users.csv)):
 
 ```sh
-➜ ./authorizer example
+➜ ./build/cli example
 {
-  "token": "example's secret",
-  "user": "example"
+  "code": 200,
+  "message": "User found!",
+  "config": {
+    "Key": "key1",
+    "Secret": "secret1"
+  }
 }
 ```
 
@@ -57,9 +64,10 @@ Invoke the CLI component to authenticate a user named `example` who is an `Autho
 Attempt to authenticate a user named `error`, representing an `Unauthorized` user:
 
 ```sh
-➜ ./authorizer error
+➜ ./build/cli error
 {
-  "error": "user 'error' not found"
+  "code": 401,
+  "message": "User not found"
 }
 ```
 
