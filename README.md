@@ -83,7 +83,7 @@ This repo contains the following major components:
 
 ```mermaid
 sequenceDiagram
-    title Funnel Plugin + S3
+    title Funnel Plugin + Per-User S3 Bucket Interactions
 
     participant User
     participant FunnelServer as Funnel Server
