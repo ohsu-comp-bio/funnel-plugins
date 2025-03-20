@@ -8,9 +8,9 @@ import (
 
 // Define a struct that matches the expected JSON response
 type Response struct {
-	Code    int         `json:"code"`
-	Message string      `json:"message"`
-	Config  Credentials `json:"config"` // Key-value pairs for configuration
+	Code    int          `json:"code"`
+	Message string       `json:"message"`
+	Config  *Credentials `json:"config"` // Key-value pairs for configuration
 }
 
 type Credentials struct {
@@ -35,7 +35,7 @@ func TestAuthorizedUser(t *testing.T) {
 	expected := Response{
 		Code:    200,
 		Message: "User found!",
-		Config: Credentials{
+		Config: &Credentials{
 			Key:    "key1",
 			Secret: "secret1",
 		},
@@ -64,7 +64,6 @@ func TestUnauthorizedUser(t *testing.T) {
 	expected := Response{
 		Code:    401,
 		Message: "User not found",
-		Config:  Credentials{},
 	}
 
 	// Compare using reflect.DeepEqual

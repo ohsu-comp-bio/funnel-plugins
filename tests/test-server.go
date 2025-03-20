@@ -10,19 +10,14 @@ import (
 )
 
 type Response struct {
-	Code    int         `json:"code"`
-	Message string      `json:"message"`
-	Config  Credentials `json:"config"` // Key-value pairs for configuration
+	Code    int          `json:"code"`
+	Message string       `json:"message"`
+	Config  *Credentials `json:"config,omitempty"` // Key-value pairs for configuration
 }
 
 type Credentials struct {
-	Key    string `json:"key"`
-	Secret string `json:"secret"`
-}
-
-type GenericS3Storage struct {
-	Key    string
-	Secret string
+	Key    string `json:"key,omitempty"`
+	Secret string `json:"secret,omitempty"`
 }
 
 func main() {
@@ -43,7 +38,7 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 	resp := Response{
 		Code:    http.StatusOK,
 		Message: "Hello, world! To get a token, send a GET request to /token?user=<user>",
-		Config:  Credentials{},
+		Config:  nil,
 	}
 	json.NewEncoder(w).Encode(resp)
 }
@@ -64,7 +59,7 @@ func tokenHandler(w http.ResponseWriter, r *http.Request) {
 		resp := Response{
 			Code:    http.StatusBadRequest,
 			Message: "User is required",
-			Config:  Credentials{},
+			Config:  nil,
 		}
 		json.NewEncoder(w).Encode(resp)
 		return
@@ -77,7 +72,7 @@ func tokenHandler(w http.ResponseWriter, r *http.Request) {
 		resp := Response{
 			Code:    http.StatusOK,
 			Message: "User found!",
-			Config: Credentials{
+			Config: &Credentials{
 				Key:    token.Key,
 				Secret: token.Secret,
 			},
@@ -88,7 +83,7 @@ func tokenHandler(w http.ResponseWriter, r *http.Request) {
 		resp := Response{
 			Code:    http.StatusUnauthorized,
 			Message: "User not found",
-			Config:  Credentials{},
+			Config:  nil,
 		}
 		json.NewEncoder(w).Encode(resp)
 	}
