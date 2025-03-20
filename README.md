@@ -81,9 +81,25 @@ This repo contains the following major components:
 
 # Sequence Diagram 📝
 
-> Created with https://sequencediagram.org ([_source_](https://github.com/ohsu-comp-bio/funnel/blob/feature/plugins/plugins/sequence-diagram.txt))
+```mermaid
+sequenceDiagram
+    title Funnel Plugin + S3
 
-![proposed-auth-design](./sequence-diagram.png)
+    participant User
+    participant FunnelServer as Funnel Server
+    participant FunnelWorker as Funnel Worker
+    participant AuthPlugin as Auth Plugin
+    participant UserDB as User Database
+    participant S3Bucket as S3 Bucket
+
+    User->>FunnelServer: Request:<br/>1) Auth Header<br/>2) TES Task<br/>3) Name of Plugin to use
+    FunnelServer->>AuthPlugin: Request:<br/>1) Auth Header<br/>2) TES Task
+    AuthPlugin->>UserDB: Username from Auth Header
+    UserDB->>AuthPlugin: S3 Credentials
+    AuthPlugin->>FunnelWorker: S3 Credentials
+    FunnelWorker->>S3Bucket: Signed Request
+    S3Bucket->>User: S3 Object
+```
 
 # Additional Resources 📚
 
