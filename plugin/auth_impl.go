@@ -15,13 +15,13 @@ import (
 // Here is a real implementation of Authorize that retrieves a "Secret" value for a user
 type Authorize struct{}
 
-func (Authorize) Get(user string) ([]byte, error) {
+func (Authorize) Get(user string, host string) ([]byte, error) {
 	if user == "" {
 		return nil, fmt.Errorf("user is required (e.g. ./authorize <user>)")
 	}
 	// Currently hardcoding the endpoint of the token service
 	// TODO: This should be made configurable similar to the test server (see tests/test-server/main.go)
-	resp, err := http.Get("http://localhost:8080/token?user=" + user)
+	resp, err := http.Get(host + user)
 	if err != nil {
 		return nil, fmt.Errorf("error making request: %w", err)
 	}

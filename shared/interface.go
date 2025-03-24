@@ -11,8 +11,16 @@ import (
 	"example.com/proto"
 	"github.com/hashicorp/go-hclog"
 	"github.com/hashicorp/go-plugin"
+	"github.com/ohsu-comp-bio/funnel/config"
 	"google.golang.org/grpc"
 )
+
+// Define a struct that matches the expected JSON response
+type Response struct {
+	Code    int            `json:"code,omitempty"`
+	Message string         `json:"message,omitempty"`
+	Config  *config.Config `json:"config,omitempty"`
+}
 
 // Handshake is a common handshake that is shared by plugin and host.
 var Handshake = plugin.HandshakeConfig{
@@ -36,7 +44,7 @@ var PluginMap = map[string]plugin.Plugin{
 
 // Authorize is the interface that we're exposing as a plugin.
 type Authorize interface {
-	Get(user string) ([]byte, error)
+	Get(user string, host string) ([]byte, error)
 }
 
 // This is the implementation of plugin.Plugin so we can serve/consume this.

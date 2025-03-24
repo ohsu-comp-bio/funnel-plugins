@@ -18,7 +18,7 @@ func run(user string, dir string) (string, error) {
 		return "", fmt.Errorf("failed to get client: %w", err)
 	}
 
-	resp, err := authorize.Get(user)
+	resp, err := authorize.Get(user, "http://localhost:8080/token?user=")
 	if err != nil {
 		return "", fmt.Errorf("failed to authorize: %w", err)
 	}

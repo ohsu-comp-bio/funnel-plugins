@@ -20,8 +20,8 @@ type RPCServer struct {
 	Impl Authorize
 }
 
-func (m *RPCServer) Get(user string, resp *[]byte) error {
-	v, err := m.Impl.Get(user)
+func (m *RPCServer) Get(user string, host string, resp *[]byte) error {
+	v, err := m.Impl.Get(user, host)
 	*resp = v
 	return err
 }

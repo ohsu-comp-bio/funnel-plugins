@@ -7,18 +7,10 @@ import (
 	"net/http"
 	"os"
 	"sync"
+
+	"example.com/shared"
+	"github.com/ohsu-comp-bio/funnel/config"
 )
-
-type Response struct {
-	Code    int          `json:"code"`
-	Message string       `json:"message"`
-	Config  *Credentials `json:"config,omitempty"` // Key-value pairs for configuration
-}
-
-type Credentials struct {
-	Key    string `json:"key,omitempty"`
-	Secret string `json:"secret,omitempty"`
-}
 
 func main() {
 	http.HandleFunc("/", indexHandler)
@@ -35,10 +27,9 @@ func main() {
 
 // Handler for root endpoint
 func indexHandler(w http.ResponseWriter, r *http.Request) {
-	resp := Response{
+	resp := shared.Response{
 		Code:    http.StatusOK,
 		Message: "Hello, world! To get a token, send a GET request to /token?user=<user>",
-		Config:  nil,
 	}
 	json.NewEncoder(w).Encode(resp)
 }
@@ -56,10 +47,9 @@ func tokenHandler(w http.ResponseWriter, r *http.Request) {
 
 	// No user provided in the query (Bad Request: 400)
 	if user == "" {
-		resp := Response{
+		resp := shared.Response{
 			Code:    http.StatusBadRequest,
 			Message: "User is required",
-			Config:  nil,
 		}
 		json.NewEncoder(w).Encode(resp)
 		return
@@ -69,28 +59,27 @@ func tokenHandler(w http.ResponseWriter, r *http.Request) {
 
 	if found {
 		// User found (OK: 200)
-		resp := Response{
-			Code:    http.StatusOK,
-			Message: "User found!",
-			Config: &Credentials{
-				Key:    token.Key,
-				Secret: token.Secret,
-			},
+		c := config.Config{}
+		c.AmazonS3.AWSConfig.Key = token.AmazonS3.Key
+		c.AmazonS3.AWSConfig.Secret = token.AmazonS3.Secret
+
+		resp := shared.Response{
+			Code:   http.StatusOK,
+			Config: &c,
 		}
 		json.NewEncoder(w).Encode(resp)
 	} else {
 		// User not found (Unauthorized: 401)
-		resp := Response{
+		resp := shared.Response{
 			Code:    http.StatusUnauthorized,
 			Message: "User not authorized",
-			Config:  nil,
 		}
 		json.NewEncoder(w).Encode(resp)
 	}
 }
 
 // Load user tokens from the CSV file
-func loadUsers(filename string) (map[string]Credentials, error) {
+func loadUsers(filename string) (map[string]config.Config, error) {
 	file, err := os.Open(filename)
 	if err != nil {
 		return nil, fmt.Errorf("failed to open file: %w", err)
@@ -103,16 +92,20 @@ func loadUsers(filename string) (map[string]Credentials, error) {
 		return nil, fmt.Errorf("failed to read CSV: %w", err)
 	}
 
-	userDB := make(map[string]Credentials)
+	userDB := make(map[string]config.Config)
 	mutex := sync.RWMutex{}
 	for i, row := range records {
 		if i == 0 {
 			continue // Skip header
 		}
 		mutex.Lock()
-		userDB[row[0]] = Credentials{
-			Key:    row[1],
-			Secret: row[2],
+		userDB[row[0]] = config.Config{
+			AmazonS3: config.AmazonS3Storage{
+				AWSConfig: config.AWSConfig{
+					Key:    row[1],
+					Secret: row[2],
+				},
+			},
 		}
 		mutex.Unlock()
 	}
