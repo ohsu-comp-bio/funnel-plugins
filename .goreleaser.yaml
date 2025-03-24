@@ -1,5 +1,7 @@
+project_name: funnel-plugins
+
 builds:
-  - binary: funnel-plugins
+  - binary: auth-plugin
     goos:
       - darwin
       - linux
@@ -22,7 +24,3 @@ release:
 
 env_files:
   github_token: .github_token
-
-archives:
-  - format: tar.gz
-    name_template: "{{.ProjectName}}-{{.Os}}-{{.Arch}}-{{.Version}}"
