@@ -33,7 +33,7 @@ var Handshake = plugin.HandshakeConfig{
 // Create an hclog.Logger
 var Logger = hclog.New(&hclog.LoggerOptions{
 	Name:  "plugin",
-	Level: hclog.Warn,
+	Level: hclog.Info,
 })
 
 // PluginMap is the map of plugins we can dispense.

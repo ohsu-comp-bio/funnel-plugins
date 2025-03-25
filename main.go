@@ -9,7 +9,7 @@ import (
 	"example.com/shared"
 )
 
-func run(user string, dir string) (string, error) {
+func run(user string, host string, dir string) (string, error) {
 	m := &shared.Manager{}
 	defer m.Close()
 
@@ -18,7 +18,7 @@ func run(user string, dir string) (string, error) {
 		return "", fmt.Errorf("failed to get client: %w", err)
 	}
 
-	resp, err := authorize.Get(user, "http://localhost:8080/token?user=")
+	resp, err := authorize.Get(user, host)
 	if err != nil {
 		return "", fmt.Errorf("failed to authorize: %w", err)
 	}
@@ -33,12 +33,17 @@ func run(user string, dir string) (string, error) {
 }
 
 func main() {
-	if len(os.Args) < 2 {
-		fmt.Printf("Usage: %s <user>\n", os.Args[0])
+	if len(os.Args) < 3 {
+		fmt.Printf("Usage: %s <USER> <HOST>\n", os.Args[0])
 		os.Exit(1)
 	}
 
-	out, err := run(os.Args[1], "build/plugins")
+	user := os.Args[1]
+	// "http://localhost:8080/token?user="
+	host := os.Args[2]
+	dir := "build/plugins"
+
+	out, err := run(user, host, dir)
 	if err != nil {
 		fmt.Println("Error calling plugin:", err)
 		os.Exit(1)

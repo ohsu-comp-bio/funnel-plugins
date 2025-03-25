@@ -16,11 +16,12 @@ import (
 type Authorize struct{}
 
 func (Authorize) Get(user string, host string) ([]byte, error) {
+	shared.Logger.Info("Get", "user", user, "host", host)
+
 	if user == "" {
-		return nil, fmt.Errorf("user is required (e.g. ./authorize <user>)")
+		return nil, fmt.Errorf("user is required (e.g. ./authorize <USER> <HOST>)")
 	}
-	// Currently hardcoding the endpoint of the token service
-	// TODO: This should be made configurable similar to the test server (see tests/test-server/main.go)
+
 	resp, err := http.Get(host + user)
 	if err != nil {
 		return nil, fmt.Errorf("error making request: %w", err)
