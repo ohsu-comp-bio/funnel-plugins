@@ -101,9 +101,44 @@ sequenceDiagram
     S3Bucket->>User: S3 Object
 ```
 
+# Authoring Plugins ✍️
+
+## Overview 🌀
+
+The following includes examples and resources for writing Plugins (in Go, Python, or any other [supported language](https://grpc.io/docs/languages/)!)
+ 
+- [gRPC Example](https://github.com/hashicorp/go-plugin/tree/main/examples/grpc) (this is largely what Funnel Plugins is based off of, along with this [manager](https://github.com/eliben/code-for-blog/blob/main/2023/go-plugin-htmlize-rpc/plugin/manager.go#L28-L83) snippet by [Eli Bendersky](https://eli.thegreenplace.net/2023/rpc-based-plugins-in-go/) for loading the plugin binaries)
+ 
+- [Intro](https://github.com/hashicorp/go-plugin/blob/main/docs/extensive-go-plugin-tutorial.md) (super helpful reference from beginning to end)
+
+## Communicating with Funnel
+
+> [!WARNING]
+> TODO: Add the following to the docs 🚧
+> - API "contract" between the Plugin and Funnel Server":
+>   - What exactly will the Plugin require for inputs and outputs (`Config`)?
+>   - What functions will plugin authors need to implement (e.g. `Get`)?
+
+## Python 🐍
+
+- [Writing Plugins Without Go](https://github.com/hashicorp/go-plugin/blob/main/docs/guide-plugin-write-non-go.md) (written by Mitchell Hashimoto one of the original co-founders of Hashicorp along with Armon Dadgar! :exploding_head:) (edited) 
+
+## gRPC + Protobuf ️🚀
+
+> [!TIP]
+> Understanding gRPC and protobufs isn't necessary to writing plugins, but it can be helpful when errors or bugs arise 🐛
+
+Under the hood, all communication between the Plugin and the Funnel Server happens over gRPC using Protocal Buffers (*protobufs*).
+
+- [Protobuf Overview](https://protobuf.dev/)
+  
+- Tutorials for [Go](https://protobuf.dev/getting-started/gotutorial/) and [Python](https://protobuf.dev/getting-started/pythontutorial/)
+ 
+- [Awesome gRPC](https://github.com/grpc-ecosystem/awesome-grpc#protocol-buffers) — pretty up-to-date resource for all things Protobuf and gRPC! 😎
 # Additional Resources 📚
 
 - https://github.com/hashicorp/go-plugin
 - https://pkg.go.dev/github.com/hashicorp/go-plugin
 - https://eli.thegreenplace.net/2023/rpc-based-plugins-in-go
 - https://github.com/eliben/code-for-blog/tree/main/2023/go-plugin-htmlize-rpc
+
