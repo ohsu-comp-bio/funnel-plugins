@@ -119,6 +119,24 @@ The following includes examples and resources for writing Plugins (in Go, Python
 >   - What exactly will the Plugin require for inputs and outputs (`Config`)?
 >   - What functions will plugin authors need to implement (e.g. `Get`)?
 
+### Inputs
+
+```go
+User string
+```
+
+### Outputs
+
+```go
+config.Config
+```
+
+### Functions
+
+```go
+Authorize.Get()
+```
+
 ## Python 🐍
 
 - [Writing Plugins Without Go](https://github.com/hashicorp/go-plugin/blob/main/docs/guide-plugin-write-non-go.md) (written by Mitchell Hashimoto one of the original co-founders of Hashicorp along with Armon Dadgar! :exploding_head:) (edited) 
