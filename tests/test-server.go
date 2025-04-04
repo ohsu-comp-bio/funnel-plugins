@@ -18,8 +18,8 @@ func main() {
 
 	// Currently hardcoding the endpoint of the token service
 	// TODO: This should be made configurable similar to the plugin (see plugin/auth_impl.go)
-	fmt.Println("Server is running on http://localhost:8080")
-	err := http.ListenAndServe("localhost:8080", nil)
+	fmt.Println("Server is running on http://0.0.0.0:8080")
+	err := http.ListenAndServe("0.0.0.0:8080", nil)
 	if err != nil {
 		fmt.Println("Error starting server:", err)
 	}
@@ -29,15 +29,17 @@ func main() {
 func indexHandler(w http.ResponseWriter, r *http.Request) {
 	resp := shared.Response{
 		Code:    http.StatusOK,
-		Message: "Hello, world! To get a token, send a GET request to /token?user=<user>",
+		Message: "Hello, world! To get a token, send a GET request to /token?user=[USER]",
 	}
 	json.NewEncoder(w).Encode(resp)
 }
 
 // Handler for retrieving user tokens
 func tokenHandler(w http.ResponseWriter, r *http.Request) {
+	fmt.Println("Received token request:", r)
+
 	// Load users from the CSV file
-	userDB, err := loadUsers("tests/example-users.csv")
+	userDB, err := loadUsers("example-users.csv")
 	if err != nil {
 		fmt.Println("Error loading users:", err)
 		return

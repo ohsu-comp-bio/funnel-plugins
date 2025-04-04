@@ -1,6 +1,3 @@
-// Copyright (c) HashiCorp, Inc.
-// SPDX-License-Identifier: MPL-2.0
-
 package main
 
 import (
@@ -16,23 +13,24 @@ import (
 type Authorize struct{}
 
 func (Authorize) Get(user string, host string) ([]byte, error) {
-	shared.Logger.Info("Get", "user", user, "host", host)
-
 	if user == "" {
 		return nil, fmt.Errorf("user is required (e.g. ./authorize <USER> <HOST>)")
 	}
 
+	shared.Logger.Info("Get", "user", user, "host", host)
 	resp, err := http.Get(host + user)
 	if err != nil {
 		return nil, fmt.Errorf("error making request: %w", err)
 	}
 	defer resp.Body.Close()
 
+	shared.Logger.Info("Response", "status", resp.Status)
 	body, err := io.ReadAll(resp.Body)
 	if err != nil {
 		return nil, fmt.Errorf("error reading response body: %w", err)
 	}
 
+	shared.Logger.Info("Response", "body", string(body))
 	return body, nil
 }
 
