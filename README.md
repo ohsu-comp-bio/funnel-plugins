@@ -139,7 +139,7 @@ Authorize.Get()
 
 ## Python 🐍
 
-- [Writing Plugins Without Go](https://github.com/hashicorp/go-plugin/blob/main/docs/guide-plugin-write-non-go.md) (written by Mitchell Hashimoto one of the original co-founders of Hashicorp along with Armon Dadgar! :exploding_head:) (edited) 
+- [Writing Plugins Without Go](https://github.com/hashicorp/go-plugin/blob/main/docs/guide-plugin-write-non-go.md) (written by Mitchell Hashimoto one of the original co-founders of Hashicorp along with Armon Dadgar! :exploding_head:)
 
 ## gRPC + Protobuf ️🚀
 
