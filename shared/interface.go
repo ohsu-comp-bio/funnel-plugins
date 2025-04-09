@@ -1,7 +1,3 @@
-// Copyright (c) HashiCorp, Inc.
-// SPDX-License-Identifier: MPL-2.0
-
-// Package shared contains shared data between the host and plugins.
 package shared
 
 import (

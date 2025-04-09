@@ -24,7 +24,7 @@ build:
 	go build -o $(DIR)/cli
 
 	# Build Plugin
-	go build -o $(DIR)/plugins/authorizer ./plugin
+	go build -o $(DIR)/plugins/authorizer ./plugin-go
 
 tests:
 	# Build test server
