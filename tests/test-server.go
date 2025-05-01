@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/csv"
 	"encoding/json"
+	"flag"
 	"fmt"
 	"net/http"
 	"os"
@@ -12,13 +13,17 @@ import (
 	"github.com/ohsu-comp-bio/funnel/config"
 )
 
+var (
+	csvFile = flag.String("users-csv", "example-users.csv", "Path to the CSV file containing user tokens")
+)
+
 func main() {
+	flag.Parse() // Parse the command-line flags
+
 	http.HandleFunc("/", indexHandler)
 	http.HandleFunc("/token", tokenHandler)
 
-	// Currently hardcoding the endpoint of the token service
-	// TODO: This should be made configurable similar to the plugin (see plugin/auth_impl.go)
-	fmt.Println("Server is running on http://0.0.0.0:8080")
+	fmt.Printf("Server is running on http://0.0.0.0:8080 using users from: %s\n", *csvFile)
 	err := http.ListenAndServe("0.0.0.0:8080", nil)
 	if err != nil {
 		fmt.Println("Error starting server:", err)
@@ -38,10 +43,11 @@ func indexHandler(w http.ResponseWriter, r *http.Request) {
 func tokenHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("Received token request:", r)
 
-	// Load users from the CSV file
-	userDB, err := loadUsers("example-users.csv")
+	// Load users from the CSV file specified by the flag
+	userDB, err := loadUsers(*csvFile)
 	if err != nil {
 		fmt.Println("Error loading users:", err)
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
 
@@ -62,8 +68,8 @@ func tokenHandler(w http.ResponseWriter, r *http.Request) {
 	if found {
 		// User found (OK: 200)
 		c := config.Config{}
-		c.AmazonS3.AWSConfig.Key = token.AmazonS3.Key
-		c.AmazonS3.AWSConfig.Secret = token.AmazonS3.Secret
+		c.AmazonS3.AWSConfig.Key = token.AmazonS3.AWSConfig.Key
+		c.AmazonS3.AWSConfig.Secret = token.AmazonS3.AWSConfig.Secret
 
 		resp := shared.Response{
 			Code:   http.StatusOK,

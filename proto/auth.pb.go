@@ -23,8 +23,8 @@ const (
 
 type GetRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	User          string                 `protobuf:"bytes,1,opt,name=user,proto3" json:"user,omitempty"`
-	Host          string                 `protobuf:"bytes,2,opt,name=host,proto3" json:"host,omitempty"`
+	Headers       map[string]string      `protobuf:"bytes,3,rep,name=headers,proto3" json:"headers,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
+	Params        map[string]string      `protobuf:"bytes,4,rep,name=params,proto3" json:"params,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -59,18 +59,18 @@ func (*GetRequest) Descriptor() ([]byte, []int) {
 	return file_proto_auth_proto_rawDescGZIP(), []int{0}
 }
 
-func (x *GetRequest) GetUser() string {
+func (x *GetRequest) GetHeaders() map[string]string {
 	if x != nil {
-		return x.User
+		return x.Headers
 	}
-	return ""
+	return nil
 }
 
-func (x *GetRequest) GetHost() string {
+func (x *GetRequest) GetParams() map[string]string {
 	if x != nil {
-		return x.Host
+		return x.Params
 	}
-	return ""
+	return nil
 }
 
 type GetResponse struct {
@@ -157,11 +157,17 @@ var File_proto_auth_proto protoreflect.FileDescriptor
 
 const file_proto_auth_proto_rawDesc = "" +
 	"\n" +
-	"\x10proto/auth.proto\x12\x05proto\"4\n" +
+	"\x10proto/auth.proto\x12\x05proto\"\xf4\x01\n" +
 	"\n" +
-	"GetRequest\x12\x12\n" +
-	"\x04user\x18\x01 \x01(\tR\x04user\x12\x12\n" +
-	"\x04host\x18\x02 \x01(\tR\x04host\"#\n" +
+	"GetRequest\x128\n" +
+	"\aheaders\x18\x03 \x03(\v2\x1e.proto.GetRequest.HeadersEntryR\aheaders\x125\n" +
+	"\x06params\x18\x04 \x03(\v2\x1d.proto.GetRequest.ParamsEntryR\x06params\x1a:\n" +
+	"\fHeadersEntry\x12\x10\n" +
+	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
+	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\x1a9\n" +
+	"\vParamsEntry\x12\x10\n" +
+	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
+	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"#\n" +
 	"\vGetResponse\x12\x14\n" +
 	"\x05value\x18\x01 \x01(\fR\x05value\"\a\n" +
 	"\x05Empty29\n" +
@@ -180,20 +186,24 @@ func file_proto_auth_proto_rawDescGZIP() []byte {
 	return file_proto_auth_proto_rawDescData
 }
 
-var file_proto_auth_proto_msgTypes = make([]protoimpl.MessageInfo, 3)
+var file_proto_auth_proto_msgTypes = make([]protoimpl.MessageInfo, 5)
 var file_proto_auth_proto_goTypes = []any{
 	(*GetRequest)(nil),  // 0: proto.GetRequest
 	(*GetResponse)(nil), // 1: proto.GetResponse
 	(*Empty)(nil),       // 2: proto.Empty
+	nil,                 // 3: proto.GetRequest.HeadersEntry
+	nil,                 // 4: proto.GetRequest.ParamsEntry
 }
 var file_proto_auth_proto_depIdxs = []int32{
-	0, // 0: proto.Authorize.Get:input_type -> proto.GetRequest
-	1, // 1: proto.Authorize.Get:output_type -> proto.GetResponse
-	1, // [1:2] is the sub-list for method output_type
-	0, // [0:1] is the sub-list for method input_type
-	0, // [0:0] is the sub-list for extension type_name
-	0, // [0:0] is the sub-list for extension extendee
-	0, // [0:0] is the sub-list for field type_name
+	3, // 0: proto.GetRequest.headers:type_name -> proto.GetRequest.HeadersEntry
+	4, // 1: proto.GetRequest.params:type_name -> proto.GetRequest.ParamsEntry
+	0, // 2: proto.Authorize.Get:input_type -> proto.GetRequest
+	1, // 3: proto.Authorize.Get:output_type -> proto.GetResponse
+	3, // [3:4] is the sub-list for method output_type
+	2, // [2:3] is the sub-list for method input_type
+	2, // [2:2] is the sub-list for extension type_name
+	2, // [2:2] is the sub-list for extension extendee
+	0, // [0:2] is the sub-list for field type_name
 }
 
 func init() { file_proto_auth_proto_init() }
@@ -207,7 +217,7 @@ func file_proto_auth_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_proto_auth_proto_rawDesc), len(file_proto_auth_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   3,
+			NumMessages:   5,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

@@ -13,7 +13,7 @@ _sym_db = _symbol_database.Default()
 
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x10proto/auth.proto\x12\x05proto\"4\n\nGetRequest\x12\x12\n\x04user\x18\x01 \x01(\tR\x04user\x12\x12\n\x04host\x18\x02 \x01(\tR\x04host\"#\n\x0bGetResponse\x12\x14\n\x05value\x18\x01 \x01(\x0cR\x05value\"\x07\n\x05\x45mpty29\n\tAuthorize\x12,\n\x03Get\x12\x11.proto.GetRequest\x1a\x12.proto.GetResponseB\tZ\x07./protob\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x10proto/auth.proto\x12\x05proto\"\xf4\x01\n\nGetRequest\x12\x38\n\x07headers\x18\x03 \x03(\x0b\x32\x1e.proto.GetRequest.HeadersEntryR\x07headers\x12\x35\n\x06params\x18\x04 \x03(\x0b\x32\x1d.proto.GetRequest.ParamsEntryR\x06params\x1a:\n\x0cHeadersEntry\x12\x10\n\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n\x05value\x18\x02 \x01(\tR\x05value:\x02\x38\x01\x1a\x39\n\x0bParamsEntry\x12\x10\n\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n\x05value\x18\x02 \x01(\tR\x05value:\x02\x38\x01\"#\n\x0bGetResponse\x12\x14\n\x05value\x18\x01 \x01(\x0cR\x05value\"\x07\n\x05\x45mpty29\n\tAuthorize\x12,\n\x03Get\x12\x11.proto.GetRequest\x1a\x12.proto.GetResponseB\tZ\x07./protob\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -21,12 +21,20 @@ _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'proto.auth_pb2', _globals)
 if _descriptor._USE_C_DESCRIPTORS == False:
   _globals['DESCRIPTOR']._options = None
   _globals['DESCRIPTOR']._serialized_options = b'Z\007./proto'
-  _globals['_GETREQUEST']._serialized_start=27
-  _globals['_GETREQUEST']._serialized_end=79
-  _globals['_GETRESPONSE']._serialized_start=81
-  _globals['_GETRESPONSE']._serialized_end=116
-  _globals['_EMPTY']._serialized_start=118
-  _globals['_EMPTY']._serialized_end=125
-  _globals['_AUTHORIZE']._serialized_start=127
-  _globals['_AUTHORIZE']._serialized_end=184
+  _globals['_GETREQUEST_HEADERSENTRY']._options = None
+  _globals['_GETREQUEST_HEADERSENTRY']._serialized_options = b'8\001'
+  _globals['_GETREQUEST_PARAMSENTRY']._options = None
+  _globals['_GETREQUEST_PARAMSENTRY']._serialized_options = b'8\001'
+  _globals['_GETREQUEST']._serialized_start=28
+  _globals['_GETREQUEST']._serialized_end=272
+  _globals['_GETREQUEST_HEADERSENTRY']._serialized_start=155
+  _globals['_GETREQUEST_HEADERSENTRY']._serialized_end=213
+  _globals['_GETREQUEST_PARAMSENTRY']._serialized_start=215
+  _globals['_GETREQUEST_PARAMSENTRY']._serialized_end=272
+  _globals['_GETRESPONSE']._serialized_start=274
+  _globals['_GETRESPONSE']._serialized_end=309
+  _globals['_EMPTY']._serialized_start=311
+  _globals['_EMPTY']._serialized_end=318
+  _globals['_AUTHORIZE']._serialized_start=320
+  _globals['_AUTHORIZE']._serialized_end=377
 # @@protoc_insertion_point(module_scope)
