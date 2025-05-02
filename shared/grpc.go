@@ -4,15 +4,19 @@ import (
 	"context"
 
 	"example.com/proto"
+	"github.com/ohsu-comp-bio/funnel/config"
+	"github.com/ohsu-comp-bio/funnel/tes"
 )
 
 // GRPCClient is an implementation of KV that talks over RPC.
 type GRPCClient struct{ client proto.AuthorizeClient }
 
-func (m *GRPCClient) Get(user string, host string) ([]byte, error) {
+func (m *GRPCClient) Get(headers, params map[string]string, config *config.Config, task *tes.Task) ([]byte, error) {
 	resp, err := m.client.Get(context.Background(), &proto.GetRequest{
-		User: user,
-		Host: host,
+		Headers: headers,
+		Params:  params,
+		Config:  config,
+		Task:    task,
 	})
 	if err != nil {
 		return nil, err
@@ -30,6 +34,6 @@ type GRPCServer struct {
 func (m *GRPCServer) Get(
 	ctx context.Context,
 	req *proto.GetRequest) (*proto.GetResponse, error) {
-	v, err := m.Impl.Get(req.User, req.Host)
+	v, err := m.Impl.Get(req.Params, req.Headers, req.Config, req.Task)
 	return &proto.GetResponse{Value: v}, err
 }

@@ -8,6 +8,7 @@ import (
 	"github.com/hashicorp/go-hclog"
 	"github.com/hashicorp/go-plugin"
 	"github.com/ohsu-comp-bio/funnel/config"
+	"github.com/ohsu-comp-bio/funnel/tes"
 	"google.golang.org/grpc"
 )
 
@@ -40,7 +41,7 @@ var PluginMap = map[string]plugin.Plugin{
 
 // Authorize is the interface that we're exposing as a plugin.
 type Authorize interface {
-	Get(user string, host string) ([]byte, error)
+	Get(params, headers map[string]string, config *config.Config, task *tes.Task) ([]byte, error)
 }
 
 // This is the implementation of plugin.Plugin so we can serve/consume this.

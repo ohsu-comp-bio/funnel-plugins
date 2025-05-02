@@ -20,13 +20,16 @@ clean:
 	rm -rf $(DIR)/*
 
 build:
+	buf dep update
+	buf build
+	buf generate
+
 	# Build CLI
 	go build -o $(DIR)/cli
 
 	# Build Plugin
 	go build -o $(DIR)/plugins/authorizer ./plugin-go
 
-	buf generate
 
 tests:
 	# Build test server

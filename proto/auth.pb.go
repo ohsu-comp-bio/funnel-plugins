@@ -7,6 +7,8 @@
 package proto
 
 import (
+	config "github.com/ohsu-comp-bio/funnel/config"
+	tes "github.com/ohsu-comp-bio/funnel/tes"
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
 	reflect "reflect"
@@ -23,8 +25,10 @@ const (
 
 type GetRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Headers       map[string]string      `protobuf:"bytes,3,rep,name=headers,proto3" json:"headers,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
-	Params        map[string]string      `protobuf:"bytes,4,rep,name=params,proto3" json:"params,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
+	Headers       map[string]string      `protobuf:"bytes,1,rep,name=headers,proto3" json:"headers,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
+	Params        map[string]string      `protobuf:"bytes,2,rep,name=params,proto3" json:"params,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
+	Config        *config.Config         `protobuf:"bytes,3,opt,name=config,proto3" json:"config,omitempty"`
+	Task          *tes.Task              `protobuf:"bytes,4,opt,name=task,proto3" json:"task,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -69,6 +73,20 @@ func (x *GetRequest) GetHeaders() map[string]string {
 func (x *GetRequest) GetParams() map[string]string {
 	if x != nil {
 		return x.Params
+	}
+	return nil
+}
+
+func (x *GetRequest) GetConfig() *config.Config {
+	if x != nil {
+		return x.Config
+	}
+	return nil
+}
+
+func (x *GetRequest) GetTask() *tes.Task {
+	if x != nil {
+		return x.Task
 	}
 	return nil
 }
@@ -157,11 +175,13 @@ var File_proto_auth_proto protoreflect.FileDescriptor
 
 const file_proto_auth_proto_rawDesc = "" +
 	"\n" +
-	"\x10proto/auth.proto\x12\x05proto\"\xf4\x01\n" +
+	"\x10proto/auth.proto\x12\x05proto\x1a\x13config/config.proto\x1a\rtes/tes.proto\"\xbb\x02\n" +
 	"\n" +
 	"GetRequest\x128\n" +
-	"\aheaders\x18\x03 \x03(\v2\x1e.proto.GetRequest.HeadersEntryR\aheaders\x125\n" +
-	"\x06params\x18\x04 \x03(\v2\x1d.proto.GetRequest.ParamsEntryR\x06params\x1a:\n" +
+	"\aheaders\x18\x01 \x03(\v2\x1e.proto.GetRequest.HeadersEntryR\aheaders\x125\n" +
+	"\x06params\x18\x02 \x03(\v2\x1d.proto.GetRequest.ParamsEntryR\x06params\x12&\n" +
+	"\x06config\x18\x03 \x01(\v2\x0e.config.ConfigR\x06config\x12\x1d\n" +
+	"\x04task\x18\x04 \x01(\v2\t.tes.TaskR\x04task\x1a:\n" +
 	"\fHeadersEntry\x12\x10\n" +
 	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
 	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\x1a9\n" +
@@ -188,22 +208,26 @@ func file_proto_auth_proto_rawDescGZIP() []byte {
 
 var file_proto_auth_proto_msgTypes = make([]protoimpl.MessageInfo, 5)
 var file_proto_auth_proto_goTypes = []any{
-	(*GetRequest)(nil),  // 0: proto.GetRequest
-	(*GetResponse)(nil), // 1: proto.GetResponse
-	(*Empty)(nil),       // 2: proto.Empty
-	nil,                 // 3: proto.GetRequest.HeadersEntry
-	nil,                 // 4: proto.GetRequest.ParamsEntry
+	(*GetRequest)(nil),    // 0: proto.GetRequest
+	(*GetResponse)(nil),   // 1: proto.GetResponse
+	(*Empty)(nil),         // 2: proto.Empty
+	nil,                   // 3: proto.GetRequest.HeadersEntry
+	nil,                   // 4: proto.GetRequest.ParamsEntry
+	(*config.Config)(nil), // 5: config.Config
+	(*tes.Task)(nil),      // 6: tes.Task
 }
 var file_proto_auth_proto_depIdxs = []int32{
 	3, // 0: proto.GetRequest.headers:type_name -> proto.GetRequest.HeadersEntry
 	4, // 1: proto.GetRequest.params:type_name -> proto.GetRequest.ParamsEntry
-	0, // 2: proto.Authorize.Get:input_type -> proto.GetRequest
-	1, // 3: proto.Authorize.Get:output_type -> proto.GetResponse
-	3, // [3:4] is the sub-list for method output_type
-	2, // [2:3] is the sub-list for method input_type
-	2, // [2:2] is the sub-list for extension type_name
-	2, // [2:2] is the sub-list for extension extendee
-	0, // [0:2] is the sub-list for field type_name
+	5, // 2: proto.GetRequest.config:type_name -> config.Config
+	6, // 3: proto.GetRequest.task:type_name -> tes.Task
+	0, // 4: proto.Authorize.Get:input_type -> proto.GetRequest
+	1, // 5: proto.Authorize.Get:output_type -> proto.GetResponse
+	5, // [5:6] is the sub-list for method output_type
+	4, // [4:5] is the sub-list for method input_type
+	4, // [4:4] is the sub-list for extension type_name
+	4, // [4:4] is the sub-list for extension extendee
+	0, // [0:4] is the sub-list for field type_name
 }
 
 func init() { file_proto_auth_proto_init() }

@@ -7,9 +7,11 @@ import (
 	"os"
 
 	"example.com/shared"
+	"github.com/ohsu-comp-bio/funnel/config"
+	"github.com/ohsu-comp-bio/funnel/tes"
 )
 
-func run(user string, host string, dir string) (string, error) {
+func run(params, header map[string]string, config *config.Config, task *tes.Task, dir string) (string, error) {
 	m := &shared.Manager{}
 	defer m.Close()
 
@@ -18,7 +20,7 @@ func run(user string, host string, dir string) (string, error) {
 		return "", fmt.Errorf("failed to get client: %w", err)
 	}
 
-	resp, err := authorize.Get(user, host)
+	resp, err := authorize.Get(params, header, config, task)
 	if err != nil {
 		return "", fmt.Errorf("failed to authorize: %w", err)
 	}
@@ -37,13 +39,18 @@ func main() {
 		fmt.Printf("Usage: %s <USER> <HOST>\n", os.Args[0])
 		os.Exit(1)
 	}
-
 	user := os.Args[1]
-	// "http://localhost:8080/token?user="
 	host := os.Args[2]
 	dir := "build/plugins"
+	params := map[string]string{
+		"user": user,
+		"host": host,
+	}
+	headers := map[string]string{}
+	config := config.DefaultConfig()
+	var task *tes.Task
 
-	out, err := run(user, host, dir)
+	out, err := run(params, headers, &config, task, dir)
 	if err != nil {
 		fmt.Println("Error calling plugin:", err)
 		os.Exit(1)

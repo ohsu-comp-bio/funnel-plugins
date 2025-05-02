@@ -7,18 +7,34 @@ import (
 
 	"example.com/shared"
 	"github.com/hashicorp/go-plugin"
+	"github.com/ohsu-comp-bio/funnel/config"
+	"github.com/ohsu-comp-bio/funnel/tes"
 )
 
 // Here is a real implementation of Authorize that retrieves a "Secret" value for a user
 type Authorize struct{}
 
-func (Authorize) Get(user string, host string) ([]byte, error) {
-	if user == "" {
-		return nil, fmt.Errorf("user is required (e.g. ./authorize <USER> <HOST>)")
+func (a Authorize) Get(params, headers map[string]string, config *config.Config, task *tes.Task) ([]byte, error) {
+	user, ok := params["user"]
+	if !ok || user == "" {
+		return nil, fmt.Errorf("user is required in params (e.g. params['user'])")
+	}
+	host, ok := params["host"]
+	if !ok || host == "" {
+		return nil, fmt.Errorf("host is required in params (e.g. params['host'])")
 	}
 
 	shared.Logger.Info("Get", "user", user, "host", host)
-	resp, err := http.Get(host + user)
+	req, err := http.NewRequest("GET", host+user, nil)
+	if err != nil {
+		return nil, fmt.Errorf("error creating request: %w", err)
+	}
+	for k, v := range headers {
+		req.Header.Set(k, v)
+	}
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
 	if err != nil {
 		return nil, fmt.Errorf("error making request: %w", err)
 	}

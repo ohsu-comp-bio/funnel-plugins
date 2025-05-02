@@ -3,30 +3,46 @@ package shared
 import (
 	"fmt"
 	"net/rpc"
+
+	"example.com/proto"
+	"github.com/ohsu-comp-bio/funnel/config"
+	"github.com/ohsu-comp-bio/funnel/tes"
 )
 
-// RPCClient is an implementation of Authorization that talks over RPC.
-type RPCClient struct{ client *rpc.Client }
-
-func (m *RPCClient) Get(user string, host string) ([]byte, error) {
-	var resp []byte
-	err := m.client.Call("Plugin.Get", []string{user, host}, &resp)
-	return resp, err
+// GetResponse holds the response for the RPC Get call.
+type GetResponse struct {
+	Value []byte
 }
 
-// Here is the RPC server that RPCClient talks to, conforming to
-// the requirements of net/rpc
+// RPCClient is an implementation of Authorize that talks over RPC.
+type RPCClient struct {
+	client *rpc.Client
+}
+
+func (m *RPCClient) Get(params, headers map[string]string, config *config.Config, task *tes.Task) ([]byte, error) {
+	var resp GetResponse
+	err := m.client.Call("Plugin.Get", &proto.GetRequest{
+		Params:  params,
+		Headers: headers,
+		Config:  config,
+		Task:    task,
+	}, &resp)
+	if err != nil {
+		return nil, fmt.Errorf("RPC Get call failed: %w", err)
+	}
+	return resp.Value, nil
+}
+
 type RPCServer struct {
-	// This is the real implementation
 	Impl Authorize
 }
 
-func (m *RPCServer) Get(args []string, resp *[]byte) error {
-	if len(args) != 2 {
-		return fmt.Errorf("expected 2 arguments, got %d", len(args))
+func (m *RPCServer) Get(args *proto.GetRequest, resp *GetResponse) error {
+	// Call the implementation's Get method with the arguments
+	v, err := m.Impl.Get(args.Params, args.Headers, args.Config, args.Task)
+	if err != nil {
+		return fmt.Errorf("authorize implementation failed: %w", err)
 	}
-	user, host := args[0], args[1]
-	v, err := m.Impl.Get(user, host)
-	*resp = v
-	return err
+	resp.Value = v
+	return nil
 }
