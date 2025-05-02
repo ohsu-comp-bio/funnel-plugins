@@ -6,12 +6,13 @@ import (
 	"fmt"
 	"os"
 
+	"example.com/proto"
 	"example.com/shared"
 	"github.com/ohsu-comp-bio/funnel/config"
 	"github.com/ohsu-comp-bio/funnel/tes"
 )
 
-func run(params, header map[string]string, config *config.Config, task *tes.Task, dir string) (string, error) {
+func run(params map[string]string, header map[string]*proto.StringList, config *config.Config, task *tes.Task, dir string) (string, error) {
 	m := &shared.Manager{}
 	defer m.Close()
 
@@ -46,7 +47,7 @@ func main() {
 		"user": user,
 		"host": host,
 	}
-	headers := map[string]string{}
+	headers := map[string]*proto.StringList{}
 	config := config.DefaultConfig()
 	var task *tes.Task
 

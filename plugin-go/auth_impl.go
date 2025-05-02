@@ -5,6 +5,7 @@ import (
 	"io"
 	"net/http"
 
+	"example.com/proto"
 	"example.com/shared"
 	"github.com/hashicorp/go-plugin"
 	"github.com/ohsu-comp-bio/funnel/config"
@@ -14,7 +15,7 @@ import (
 // Here is a real implementation of Authorize that retrieves a "Secret" value for a user
 type Authorize struct{}
 
-func (a Authorize) Get(params, headers map[string]string, config *config.Config, task *tes.Task) ([]byte, error) {
+func (a Authorize) Get(params map[string]string, headers map[string]*proto.StringList, config *config.Config, task *tes.Task) ([]byte, error) {
 	user, ok := params["user"]
 	if !ok || user == "" {
 		return nil, fmt.Errorf("user is required in params (e.g. params['user'])")
@@ -30,7 +31,9 @@ func (a Authorize) Get(params, headers map[string]string, config *config.Config,
 		return nil, fmt.Errorf("error creating request: %w", err)
 	}
 	for k, v := range headers {
-		req.Header.Set(k, v)
+		for _, val := range v.Values {
+			req.Header.Add(k, val)
+		}
 	}
 
 	client := &http.Client{}

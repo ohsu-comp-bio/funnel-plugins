@@ -41,7 +41,7 @@ var PluginMap = map[string]plugin.Plugin{
 
 // Authorize is the interface that we're exposing as a plugin.
 type Authorize interface {
-	Get(params, headers map[string]string, config *config.Config, task *tes.Task) ([]byte, error)
+	Get(params map[string]string, headers map[string]*proto.StringList, config *config.Config, task *tes.Task) ([]byte, error)
 }
 
 // This is the implementation of plugin.Plugin so we can serve/consume this.

@@ -11,7 +11,7 @@ import (
 // GRPCClient is an implementation of KV that talks over RPC.
 type GRPCClient struct{ client proto.AuthorizeClient }
 
-func (m *GRPCClient) Get(headers, params map[string]string, config *config.Config, task *tes.Task) ([]byte, error) {
+func (m *GRPCClient) Get(headers map[string]*proto.StringList, params map[string]string, config *config.Config, task *tes.Task) ([]byte, error) {
 	resp, err := m.client.Get(context.Background(), &proto.GetRequest{
 		Headers: headers,
 		Params:  params,
