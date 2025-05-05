@@ -1,12 +1,15 @@
 package main
 
 import (
+	"encoding/gob"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 
-	"example.com/proto"
-	"example.com/shared"
+	"github.com/ohsu-comp-bio/funnel/plugins/proto"
+	"github.com/ohsu-comp-bio/funnel/plugins/shared"
+
 	"github.com/hashicorp/go-plugin"
 	"github.com/ohsu-comp-bio/funnel/config"
 	"github.com/ohsu-comp-bio/funnel/tes"
@@ -16,11 +19,12 @@ import (
 type Authorize struct{}
 
 func (a Authorize) Get(params map[string]string, headers map[string]*proto.StringList, config *config.Config, task *tes.Task) ([]byte, error) {
-	user, ok := params["user"]
+	fmt.Println("PARAMS: ", params)
+	user, ok := params["Input"]
 	if !ok || user == "" {
 		return nil, fmt.Errorf("user is required in params (e.g. params['user'])")
 	}
-	host, ok := params["host"]
+	host, ok := params["Host"]
 	if !ok || host == "" {
 		return nil, fmt.Errorf("host is required in params (e.g. params['host'])")
 	}
@@ -54,6 +58,10 @@ func (a Authorize) Get(params map[string]string, headers map[string]*proto.Strin
 }
 
 func main() {
+	log.Println("Server: registering gob types")
+	gob.Register(&config.TimeoutConfig_Duration{})
+	gob.Register(&config.TimeoutConfig_Disabled{})
+
 	plugin.Serve(&plugin.ServeConfig{
 		HandshakeConfig: shared.Handshake,
 		Plugins: map[string]plugin.Plugin{

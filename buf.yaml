@@ -1,4 +1,0 @@
-version: v1
-name: github.com/ohsu-comp-bio/funnel-plugins
-deps:
-  - buf.build/calypr/funnel

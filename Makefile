@@ -20,10 +20,6 @@ clean:
 	rm -rf $(DIR)/*
 
 build:
-	buf dep update
-	buf build
-	buf generate
-
 	# Build CLI
 	go build -o $(DIR)/cli
 

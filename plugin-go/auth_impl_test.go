@@ -5,8 +5,8 @@ import (
 	"reflect"
 	"testing"
 
-	"example.com/shared"
 	"github.com/ohsu-comp-bio/funnel/config"
+	"github.com/ohsu-comp-bio/funnel/plugins/shared"
 )
 
 var host = "http://localhost:8080/token?user="

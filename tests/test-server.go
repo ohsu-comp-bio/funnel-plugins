@@ -9,8 +9,8 @@ import (
 	"os"
 	"sync"
 
-	"example.com/shared"
 	"github.com/ohsu-comp-bio/funnel/config"
+	"github.com/ohsu-comp-bio/funnel/plugins/shared"
 )
 
 var (
@@ -50,6 +50,7 @@ func tokenHandler(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
 		return
 	}
+	fmt.Println("USERS: ", userDB)
 
 	user := r.URL.Query().Get("user")
 
@@ -67,13 +68,18 @@ func tokenHandler(w http.ResponseWriter, r *http.Request) {
 
 	if found {
 		// User found (OK: 200)
-		c := config.Config{}
+		c := &config.Config{
+			AmazonS3: &config.AmazonS3Storage{
+				AWSConfig: &config.AWSConfig{},
+			},
+		}
+		fmt.Printf("TOKEN: %#v\n", token.AmazonS3.AWSConfig.Key)
 		c.AmazonS3.AWSConfig.Key = token.AmazonS3.AWSConfig.Key
 		c.AmazonS3.AWSConfig.Secret = token.AmazonS3.AWSConfig.Secret
 
 		resp := shared.Response{
 			Code:   http.StatusOK,
-			Config: &c,
+			Config: c,
 		}
 		json.NewEncoder(w).Encode(resp)
 	} else {
@@ -108,8 +114,8 @@ func loadUsers(filename string) (map[string]config.Config, error) {
 		}
 		mutex.Lock()
 		userDB[row[0]] = config.Config{
-			AmazonS3: config.AmazonS3Storage{
-				AWSConfig: config.AWSConfig{
+			AmazonS3: &config.AmazonS3Storage{
+				AWSConfig: &config.AWSConfig{
 					Key:    row[1],
 					Secret: row[2],
 				},
