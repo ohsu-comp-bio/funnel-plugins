@@ -64,11 +64,10 @@ func tokenHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	fmt.Printf("Received Body: %#v\n", receivedData)
-
 	// Now you can access the parsed config and task objects
-	fmt.Printf("Received Config: %+v\n", receivedData.Config)
-	fmt.Printf("Received Task: %+v\n", receivedData.Task)
+	fmt.Printf("Received Config: %#v\n", receivedData.Config)
+	fmt.Printf("Received Task: %#v\n", receivedData.Task)
+	fmt.Printf("Received Headers: %#v\n", receivedData.Headers)
 
 	// Load users from the CSV file specified by the flag
 	userDB, err := loadUsers(*csvFile)
