@@ -60,8 +60,8 @@ github.com/mattn/go-isatty v0.0.12/go.mod h1:cbi8OIDigv2wuxKPP5vlRcQ1OAZbq2CE4Ky
 github.com/mattn/go-isatty v0.0.14/go.mod h1:7GGIvUiUoEMVVmxf/4nioHXj79iQHKdU27kJ6hsGG94=
 github.com/mattn/go-isatty v0.0.17 h1:BTarxUcIeDqL27Mc+vyvdWYSL28zpIhv3RoTdsLMPng=
 github.com/mattn/go-isatty v0.0.17/go.mod h1:kYGgaQfpe5nmfYZH+SKPsOc2e4SrIfOl2e/yFXSvRLM=
-github.com/ohsu-comp-bio/funnel v0.0.0-20250502223506-7b524039c860 h1:EAC8lGXLFqBkqZ+RSzZZwT+C9vZWMAiX8qu1K1nkNx8=
-github.com/ohsu-comp-bio/funnel v0.0.0-20250502223506-7b524039c860/go.mod h1:1xXcKLg2vVMEcNT9VkjfeR2N9s74XcKn09FhRy+hQWw=
+github.com/ohsu-comp-bio/funnel v0.0.0-20250505205339-e7df5cec1613 h1:hRXDcUybqTQsRofqFQEsFVuIEhl0bnZuBe0IiFPq+3c=
+github.com/ohsu-comp-bio/funnel v0.0.0-20250505205339-e7df5cec1613/go.mod h1:1xXcKLg2vVMEcNT9VkjfeR2N9s74XcKn09FhRy+hQWw=
 github.com/oklog/run v1.0.0 h1:Ru7dDtJNOyC66gQ5dQmaCa0qIsAUFY3sFpK1Xk8igrw=
 github.com/oklog/run v1.0.0/go.mod h1:dlhp/R75TPv97u0XWUtDeV/lRKWPKSdTuV0TZvrmrQA=
 github.com/pkg/diff v0.0.0-20210226163009-20ebb0f2a09e/go.mod h1:pJLUxLENpZxwdsKMEsNbx1VGcRFpLqf3715MtcvvzbA=

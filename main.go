@@ -1,8 +1,6 @@
 package main
 
 import (
-	"bytes"
-	"encoding/json"
 	"fmt"
 	"os"
 
@@ -25,13 +23,7 @@ func run(params map[string]string, header map[string]*proto.StringList, config *
 		return "", fmt.Errorf("failed to authorize: %w", err)
 	}
 
-	// Pretty print directly from raw JSON response
-	var out bytes.Buffer
-	if err := json.Indent(&out, resp, "", "  "); err != nil {
-		return "", fmt.Errorf("error formatting JSON: %w", err)
-	}
-
-	return out.String(), nil
+	return resp.String(), nil
 }
 
 func main() {

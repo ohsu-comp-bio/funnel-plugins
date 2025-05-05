@@ -5,12 +5,15 @@ import (
 	"encoding/json"
 	"flag"
 	"fmt"
+	"io"
 	"net/http"
 	"os"
 	"sync"
 
 	"github.com/ohsu-comp-bio/funnel/config"
+	"github.com/ohsu-comp-bio/funnel/plugins/proto"
 	"github.com/ohsu-comp-bio/funnel/plugins/shared"
+	"google.golang.org/protobuf/encoding/protojson"
 )
 
 var (
@@ -32,16 +35,40 @@ func main() {
 
 // Handler for root endpoint
 func indexHandler(w http.ResponseWriter, r *http.Request) {
-	resp := shared.Response{
+	resp := &proto.GetResponse{ // Note the pointer here
 		Code:    http.StatusOK,
 		Message: "Hello, world! To get a token, send a GET request to /token?user=[USER]",
 	}
-	json.NewEncoder(w).Encode(resp)
+	encodeResponse(w, resp)
 }
 
 // Handler for retrieving user tokens
 func tokenHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("Received token request:", r)
+
+	bodyBytes, err := io.ReadAll(r.Body)
+	if err != nil {
+		http.Error(w, fmt.Sprintf("Failed to read request body: %v", err), http.StatusBadRequest)
+		return
+	}
+	defer r.Body.Close()
+
+	receivedData := &proto.GetRequest{}
+	unmarshalOptions := protojson.UnmarshalOptions{
+		DiscardUnknown: true, // Or false, depending on your needs
+	}
+
+	err = unmarshalOptions.Unmarshal(bodyBytes, receivedData)
+	if err != nil {
+		http.Error(w, fmt.Sprintf("Failed to unmarshal GetRequest from JSON using protojson: %v", err), http.StatusBadRequest)
+		return
+	}
+
+	fmt.Printf("Received Body: %#v\n", receivedData)
+
+	// Now you can access the parsed config and task objects
+	fmt.Printf("Received Config: %+v\n", receivedData.Config)
+	fmt.Printf("Received Task: %+v\n", receivedData.Task)
 
 	// Load users from the CSV file specified by the flag
 	userDB, err := loadUsers(*csvFile)
@@ -56,7 +83,7 @@ func tokenHandler(w http.ResponseWriter, r *http.Request) {
 
 	// No user provided in the query (Bad Request: 400)
 	if user == "" {
-		resp := shared.Response{
+		resp := proto.GetResponse{
 			Code:    http.StatusBadRequest,
 			Message: "User is required",
 		}
@@ -67,29 +94,27 @@ func tokenHandler(w http.ResponseWriter, r *http.Request) {
 	token, found := userDB[user]
 
 	if found {
-		// User found (OK: 200)
-		c := &config.Config{
-			AmazonS3: &config.AmazonS3Storage{
-				AWSConfig: &config.AWSConfig{},
-			},
-		}
-		fmt.Printf("TOKEN: %#v\n", token.AmazonS3.AWSConfig.Key)
-		c.AmazonS3.AWSConfig.Key = token.AmazonS3.AWSConfig.Key
-		c.AmazonS3.AWSConfig.Secret = token.AmazonS3.AWSConfig.Secret
-
-		resp := shared.Response{
-			Code:   http.StatusOK,
-			Config: c,
-		}
-		json.NewEncoder(w).Encode(resp)
+		shared.Logger.Debug("Found token for user:", user, "Token Key:", token.AmazonS3.AWSConfig.Key)
+		receivedData.Config.AmazonS3.AWSConfig.Key = token.AmazonS3.AWSConfig.Key
+		receivedData.Config.AmazonS3.AWSConfig.Secret = token.AmazonS3.AWSConfig.Secret
+		encodeResponse(w, &proto.GetResponse{Code: http.StatusOK, Config: receivedData.Config, Task: receivedData.Task})
 	} else {
-		// User not found (Unauthorized: 401)
-		resp := shared.Response{
-			Code:    http.StatusUnauthorized,
-			Message: "User not authorized",
-		}
-		json.NewEncoder(w).Encode(resp)
+		shared.Logger.Warn("User not authorized:", user)
+		encodeResponse(w, &proto.GetResponse{Code: http.StatusUnauthorized, Message: "User not authorized", Config: receivedData.Config, Task: receivedData.Task})
 	}
+}
+
+func encodeResponse(w http.ResponseWriter, resp *proto.GetResponse) {
+	w.WriteHeader(int(resp.Code))
+	marshalOptions := protojson.MarshalOptions{} // You can customize options if needed
+	responseBody, err := marshalOptions.Marshal(resp)
+	if err != nil {
+		shared.Logger.Error("Error marshaling protojson response:", err)
+		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		return
+	}
+	w.Header().Set("Content-Type", "application/json") // Important: Set the correct Content-Type
+	w.Write(responseBody)
 }
 
 // Load user tokens from the CSV file
