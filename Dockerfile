@@ -1,5 +1,5 @@
 # Use the official Golang image as the base image
-FROM golang:1.23-alpine
+FROM golang:1.24.2-alpine
 
 # Set the Current Working Directory inside the container
 WORKDIR /app
@@ -20,4 +20,4 @@ RUN mkdir -p ./build/plugins
 RUN go build -o ./build/cli .
 
 # Build the plugin
-RUN go build -o ./build/plugins/authorizer ./plugin
+RUN go build -o ./build/plugins/authorizer ./plugin-go

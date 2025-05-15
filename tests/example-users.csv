@@ -1,5 +1,9 @@
-user,key,secret
-example,key1,secret1
-foo,key2,secret2
-bar,key3,secret3
-foobar,key4,secret4
+user,key,secret,GET,PUT,DELETE
+example,key1,secret1,1,1,1
+foo,key2,secret2,1,0,1
+bar,key3,secret3,0,0,0
+foobar,key4,secret4,0,1,1
+alpha,key5,secret5,1,1,0
+beta,key6,secret6,1,0,0
+gamma,key7,secret7,0,1,0
+delta,key8,secret8,0,0,1

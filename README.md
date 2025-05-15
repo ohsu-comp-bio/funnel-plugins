@@ -36,7 +36,7 @@ First build and run the test User Database server:
 > | `test-server`        | the Test Server used for storing user and credentials (called by the plugin) |
 > | `plugins/authorizer` | the plugin binary                                                            |
 
-## 2. Start the Test Server 
+## 2. Start the Test Server
 
 ```sh
 ➜ ./test-server
@@ -106,15 +106,16 @@ sequenceDiagram
 ## Overview 🌀
 
 The following includes examples and resources for writing Plugins (in Go, Python, or any other [supported language](https://grpc.io/docs/languages/)!)
- 
+
 - [gRPC Example](https://github.com/hashicorp/go-plugin/tree/main/examples/grpc) (this is largely what Funnel Plugins is based off of, along with this [manager](https://github.com/eliben/code-for-blog/blob/main/2023/go-plugin-htmlize-rpc/plugin/manager.go#L28-L83) snippet by [Eli Bendersky](https://eli.thegreenplace.net/2023/rpc-based-plugins-in-go/) for loading the plugin binaries)
- 
+
 - [Intro](https://github.com/hashicorp/go-plugin/blob/main/docs/extensive-go-plugin-tutorial.md) (super helpful reference from beginning to end)
 
 ## Communicating with Funnel
 
 > [!WARNING]
 > TODO: Add the following to the docs 🚧
+>
 > - API "contract" between the Plugin and Funnel Server":
 >   - What exactly will the Plugin require for inputs and outputs (`Config`)?
 >   - What functions will plugin authors need to implement (e.g. `Get`)?
@@ -146,13 +147,14 @@ For authoring custom plugins in Python, see the [example Python plugin](./plugin
 > [!TIP]
 > Understanding gRPC and protobufs isn't necessary to writing plugins, but it can be helpful when errors or bugs arise 🐛
 
-Under the hood, all communication between the Plugin and the Funnel Server happens over gRPC using Protocal Buffers (*protobufs*).
+Under the hood, all communication between the Plugin and the Funnel Server happens over gRPC using Protocal Buffers (_protobufs_).
 
 - [Protobuf Overview](https://protobuf.dev/)
-  
+
 - Tutorials for [Go](https://protobuf.dev/getting-started/gotutorial/) and [Python](https://protobuf.dev/getting-started/pythontutorial/)
- 
+
 - [Awesome gRPC](https://github.com/grpc-ecosystem/awesome-grpc#protocol-buffers) — pretty up-to-date resource for all things Protobuf and gRPC! 😎
+
 # Additional Resources 📚
 
 - https://github.com/hashicorp/go-plugin
@@ -160,3 +162,49 @@ Under the hood, all communication between the Plugin and the Funnel Server happe
 - https://eli.thegreenplace.net/2023/rpc-based-plugins-in-go
 - https://github.com/eliben/code-for-blog/tree/main/2023/go-plugin-htmlize-rpc
 
+## Local testing
+
+Assuming funnel is running `funnel server run -c config.yaml`
+with a plugin enabled in the config like
+
+```
+Plugins:
+  Path: build/plugins/authorizer
+  Params:
+    Host: http://localhost:8080/token?user=
+```
+
+Create a task that will pass through the plugin with
+
+```
+curl -X POST \
+     http://localhost:8000/v1/tasks \
+     -H "Content-Type: application/json" \
+     -H "Authorization: testauthz" \
+     -d @tests/plugin-test.json
+```
+
+where tests/plugin-test.json is a basic json test like:
+
+```
+{
+  "name": "Hello world",
+  "description": "Demonstrates the most basic echo task.",
+  "executors": [
+    {
+      "image": "alpine",
+      "command": ["echo", "hello world"]
+    }
+  ],
+  "tags": {
+    "user": "foo"
+  }
+}
+```
+
+This should hit the plugin, contact whatever endpoint is specified,
+and return the response packet from the specified server.
+
+Any special headers that are passed when creating the task should be accessible in the example test server run with
+
+`go run tests/test-server.go --users-csv tests/example-users.csv`

@@ -11,9 +11,11 @@ from google.protobuf.internal import builder as _builder
 _sym_db = _symbol_database.Default()
 
 
+from config import config_pb2 as config_dot_config__pb2
+from tes import tes_pb2 as tes_dot_tes__pb2
 
 
-DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x10proto/auth.proto\x12\x05proto\"4\n\nGetRequest\x12\x12\n\x04user\x18\x01 \x01(\tR\x04user\x12\x12\n\x04host\x18\x02 \x01(\tR\x04host\"#\n\x0bGetResponse\x12\x14\n\x05value\x18\x01 \x01(\x0cR\x05value\"\x07\n\x05\x45mpty29\n\tAuthorize\x12,\n\x03Get\x12\x11.proto.GetRequest\x1a\x12.proto.GetResponseB\tZ\x07./protob\x06proto3')
+DESCRIPTOR = _descriptor_pool.Default().AddSerializedFile(b'\n\x10proto/auth.proto\x12\x05proto\x1a\x13\x63onfig/config.proto\x1a\rtes/tes.proto\"$\n\nStringList\x12\x16\n\x06values\x18\x01 \x03(\tR\x06values\"\xce\x02\n\nGetRequest\x12\x38\n\x07headers\x18\x01 \x03(\x0b\x32\x1e.proto.GetRequest.HeadersEntryR\x07headers\x12\x35\n\x06params\x18\x02 \x03(\x0b\x32\x1d.proto.GetRequest.ParamsEntryR\x06params\x12&\n\x06\x63onfig\x18\x03 \x01(\x0b\x32\x0e.config.ConfigR\x06\x63onfig\x12\x1d\n\x04task\x18\x04 \x01(\x0b\x32\t.tes.TaskR\x04task\x1aM\n\x0cHeadersEntry\x12\x10\n\x03key\x18\x01 \x01(\tR\x03key\x12\'\n\x05value\x18\x02 \x01(\x0b\x32\x11.proto.StringListR\x05value:\x02\x38\x01\x1a\x39\n\x0bParamsEntry\x12\x10\n\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n\x05value\x18\x02 \x01(\tR\x05value:\x02\x38\x01\"#\n\x0bGetResponse\x12\x14\n\x05value\x18\x01 \x01(\x0cR\x05value\"\x07\n\x05\x45mpty29\n\tAuthorize\x12,\n\x03Get\x12\x11.proto.GetRequest\x1a\x12.proto.GetResponseB\tZ\x07./protob\x06proto3')
 
 _globals = globals()
 _builder.BuildMessageAndEnumDescriptors(DESCRIPTOR, _globals)
@@ -21,12 +23,22 @@ _builder.BuildTopDescriptorsAndMessages(DESCRIPTOR, 'proto.auth_pb2', _globals)
 if _descriptor._USE_C_DESCRIPTORS == False:
   _globals['DESCRIPTOR']._options = None
   _globals['DESCRIPTOR']._serialized_options = b'Z\007./proto'
-  _globals['_GETREQUEST']._serialized_start=27
-  _globals['_GETREQUEST']._serialized_end=79
-  _globals['_GETRESPONSE']._serialized_start=81
-  _globals['_GETRESPONSE']._serialized_end=116
-  _globals['_EMPTY']._serialized_start=118
-  _globals['_EMPTY']._serialized_end=125
-  _globals['_AUTHORIZE']._serialized_start=127
-  _globals['_AUTHORIZE']._serialized_end=184
+  _globals['_GETREQUEST_HEADERSENTRY']._options = None
+  _globals['_GETREQUEST_HEADERSENTRY']._serialized_options = b'8\001'
+  _globals['_GETREQUEST_PARAMSENTRY']._options = None
+  _globals['_GETREQUEST_PARAMSENTRY']._serialized_options = b'8\001'
+  _globals['_STRINGLIST']._serialized_start=63
+  _globals['_STRINGLIST']._serialized_end=99
+  _globals['_GETREQUEST']._serialized_start=102
+  _globals['_GETREQUEST']._serialized_end=436
+  _globals['_GETREQUEST_HEADERSENTRY']._serialized_start=300
+  _globals['_GETREQUEST_HEADERSENTRY']._serialized_end=377
+  _globals['_GETREQUEST_PARAMSENTRY']._serialized_start=379
+  _globals['_GETREQUEST_PARAMSENTRY']._serialized_end=436
+  _globals['_GETRESPONSE']._serialized_start=438
+  _globals['_GETRESPONSE']._serialized_end=473
+  _globals['_EMPTY']._serialized_start=475
+  _globals['_EMPTY']._serialized_end=482
+  _globals['_AUTHORIZE']._serialized_start=484
+  _globals['_AUTHORIZE']._serialized_end=541
 # @@protoc_insertion_point(module_scope)
