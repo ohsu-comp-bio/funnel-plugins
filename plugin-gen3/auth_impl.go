@@ -28,9 +28,10 @@ type AccessTokenResponse struct {
 }
 
 type StorageInfoResponse struct {
-	Bucket    string `json:"bucket"`
-	Region    string `json:"region"`
-	KmsKeyArn string `json:"kms_key_arn"`
+	Bucket              string `json:"bucket"`
+	Region              string `json:"region"`
+	KmsKeyArn           string `json:"kms_key_arn"`
+	S3FilesFilesystemId string `json:"s3files_filesystem_id"`
 }
 
 func validateTokenAndExtractUserId(token string) (string, error) {
@@ -192,6 +193,7 @@ func (a Authorize) PluginAction(params map[string]string, headers map[string]*pr
 			KmsKeyID: storageInfoResponse.KmsKeyArn,
 		},
 	}
+	configuration.storage.s3FilesFilesystemId = storageInfoResponse.S3FilesFilesystemId
 
 	// parse internal tags into the appropriate configuration
 	nodeSelector, ok := task.Tags["_NODE_SELECTOR"]
