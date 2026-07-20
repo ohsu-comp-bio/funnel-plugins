@@ -1,10 +1,10 @@
-module github.com/ohsu-comp-bio/funnel-plugins
+module github.com/calypr/funnel-plugins
 
 go 1.26.0
 
 require (
 	github.com/hashicorp/go-plugin v1.7.0
-	github.com/ohsu-comp-bio/funnel v0.11.11-rc.1
+	github.com/calypr/funnel v0.11.14
 	github.com/uc-cdis/go-authutils v0.1.2
 	google.golang.org/protobuf v1.36.11
 )

@@ -7,8 +7,8 @@ import (
 	"reflect"
 	"testing"
 
-	"github.com/ohsu-comp-bio/funnel/config"
-	"github.com/ohsu-comp-bio/funnel/plugins/proto"
+	"github.com/calypr/funnel/config"
+	"github.com/calypr/funnel/plugins/proto"
 )
 
 var host = "http://localhost:8080/token?user="
