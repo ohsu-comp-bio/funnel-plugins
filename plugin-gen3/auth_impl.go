@@ -12,13 +12,13 @@ import (
 	"strings"
 	"time"
 
-	"github.com/calypr/funnel/config"
-	"github.com/calypr/funnel/plugins/proto"
-	"github.com/calypr/funnel/plugins/shared"
+	"github.com/ohsu-comp-bio/funnel/config"
+	"github.com/ohsu-comp-bio/funnel/plugins/proto"
+	"github.com/ohsu-comp-bio/funnel/plugins/shared"
 	"github.com/uc-cdis/go-authutils/authutils"
 
-	"github.com/calypr/funnel/tes"
 	"github.com/hashicorp/go-plugin"
+	"github.com/ohsu-comp-bio/funnel/tes"
 )
 
 type Authorize struct{}

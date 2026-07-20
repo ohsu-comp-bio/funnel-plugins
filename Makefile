@@ -5,10 +5,10 @@ export GIT_BRANCH = $(git_branch)
 export GIT_UPSTREAM = $(git_upstream)
 
 VERSION_LDFLAGS=\
- -X "github.com/calypr/funnel/version.BuildDate=$(shell date)" \
- -X "github.com/calypr/funnel/version.GitCommit= $(git_commit)" \
- -X "github.com/calypr/funnel/version.GitBranch=$(git_branch)" \
- -X "github.com/calypr/funnel/version.GitUpstream=$(git_upstream)"
+ -X "github.com/ohsu-comp-bio/funnel/version.BuildDate=$(shell date)" \
+ -X "github.com/ohsu-comp-bio/funnel/version.GitCommit= $(git_commit)" \
+ -X "github.com/ohsu-comp-bio/funnel/version.GitBranch=$(git_branch)" \
+ -X "github.com/ohsu-comp-bio/funnel/version.GitUpstream=$(git_upstream)"
 
 DIR = build
 

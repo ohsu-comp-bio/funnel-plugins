@@ -11,9 +11,9 @@ import (
 	"strconv"
 	"sync"
 
-	"github.com/calypr/funnel/config"
-	"github.com/calypr/funnel/plugins/proto"
-	"github.com/calypr/funnel/plugins/shared"
+	"github.com/ohsu-comp-bio/funnel/config"
+	"github.com/ohsu-comp-bio/funnel/plugins/proto"
+	"github.com/ohsu-comp-bio/funnel/plugins/shared"
 	"google.golang.org/protobuf/encoding/protojson"
 )
 
