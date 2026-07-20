@@ -193,7 +193,7 @@ func (a Authorize) PluginAction(params map[string]string, headers map[string]*pr
 			KmsKeyID: storageInfoResponse.KmsKeyArn,
 		},
 	}
-	configuration.storage.s3FilesFilesystemId = storageInfoResponse.S3FilesFilesystemId
+	configuration.Kubernetes.S3FilesFilesystemId = storageInfoResponse.S3FilesFilesystemId
 
 	// parse internal tags into the appropriate configuration
 	nodeSelector, ok := task.Tags["_NODE_SELECTOR"]
