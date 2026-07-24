@@ -239,7 +239,7 @@ func (a Authorize) PluginAction(params map[string]string, headers map[string]*pr
 		}
 		shared.Logger.Info("Configuration", "Tolerations", configuration.Kubernetes.Tolerations)
 	}
-
+	shared.Logger.Info("Configuration", "S3Files FS ID before returning to funnel-server", configuration.Kubernetes.S3FilesFilesystemId)
 	return &proto.JobResponse{Code: http.StatusOK, Config: configuration, Task: task}, nil
 }
 
