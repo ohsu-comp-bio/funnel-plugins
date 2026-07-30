@@ -155,8 +155,7 @@ func (a Authorize) PluginAction(params map[string]string, headers map[string]*pr
 	if err != nil {
 		return errorResponse(http.StatusInternalServerError, fmt.Sprintf("could not parse '%s' response body: %w", url, err))
 	}
-	shared.Logger.Info("User's storage", "Bucket", storageInfoResponse.Bucket, "Region", storageInfoResponse.Region, "S3Files fs-id", storageInfoResponse.S3FilesFilesystemId)
-	shared.Logger.Info("Config value for s3files FS ID ", configuration.Kubernetes.S3FilesFilesystemId)
+	shared.Logger.Info("User's storage", "Bucket", storageInfoResponse.Bucket, "Region", storageInfoResponse.Region, "S3FilesFilesystemId", storageInfoResponse.S3FilesFilesystemId)
 
 	// exchange the OIDC client ID and secret for an access token
 	url = "http://fence-service/oauth2/token?grant_type=client_credentials&scope=openid%20user"
@@ -239,7 +238,7 @@ func (a Authorize) PluginAction(params map[string]string, headers map[string]*pr
 		}
 		shared.Logger.Info("Configuration", "Tolerations", configuration.Kubernetes.Tolerations)
 	}
-	shared.Logger.Info("Configuration", "S3Files FS ID before returning to funnel-server", configuration.Kubernetes.S3FilesFilesystemId)
+	shared.Logger.Info("Configuration", "S3FilesFilesystemId", configuration.Kubernetes.S3FilesFilesystemId)
 	return &proto.JobResponse{Code: http.StatusOK, Config: configuration, Task: task}, nil
 }
 
