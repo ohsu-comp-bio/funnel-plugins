@@ -199,6 +199,7 @@ func (a Authorize) PluginAction(params map[string]string, headers map[string]*pr
 		// Explicitly wipe out any residual value from previous runs
 		configuration.Kubernetes.S3FilesFilesystemId = ""
 	}
+	shared.Logger.Info("Configuration", "S3FilesFilesystemId", configuration.Kubernetes.S3FilesFilesystemId)
 
 	// parse internal tags into the appropriate configuration
 	nodeSelector, ok := task.Tags["_NODE_SELECTOR"]
@@ -238,7 +239,7 @@ func (a Authorize) PluginAction(params map[string]string, headers map[string]*pr
 		}
 		shared.Logger.Info("Configuration", "Tolerations", configuration.Kubernetes.Tolerations)
 	}
-	shared.Logger.Info("Configuration", "S3FilesFilesystemId", configuration.Kubernetes.S3FilesFilesystemId)
+
 	return &proto.JobResponse{Code: http.StatusOK, Config: configuration, Task: task}, nil
 }
 
